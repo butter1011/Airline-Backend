@@ -36,7 +36,20 @@ const createAirlineAirport = async (req, res) => {
     });
   }
 };
+exports.getAirlineAirport = async (req, res) => {
+  try {
+    const airlineAirports = await AirlineAirport.find();
 
+    res.status(200).json({
+      message: "Airline/Airport data retrieved successfully",
+      data: airlineAirports,
+    });
+  } catch (error) {
+    console.error("Error fetching airline/airport data:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 module.exports = {
   createAirlineAirport,
+  getAirlineAirport,
 };
