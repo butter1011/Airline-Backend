@@ -36,7 +36,7 @@ const createAirlineAirport = async (req, res) => {
     });
   }
 };
-exports.getAirlineAirport = async (req, res) => {
+const getAirlineAirport = async (req, res) => {
   try {
     const airlineAirports = await AirlineAirport.find();
 
