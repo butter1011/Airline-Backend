@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
   identityValue: { type: String, unique: true },
 });
 
-const User = mongoose.model("UserInfo", userSchema);
+const User = mongoose.model("AirlineUsers", userSchema);
 
 app.post("/auth/signin", async (req, res) => {
   const { name, identityValue } = {
