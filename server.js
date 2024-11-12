@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const connectDB = require("./utils/connectDB.js");
-const airlineRouter = require("./routes/airlineRoute.js");
+const airlineRouter = require("./routes/routes.js");
 const bodyParser = require('body-parser');
 
 

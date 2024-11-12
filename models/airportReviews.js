@@ -6,7 +6,28 @@ const airportReviewSchema = new mongoose.Schema({
     ref: "UserInfo",
     required: true,
   },
-  
+
+  from: {
+    type: String,
+    required: true,
+  },
+
+  to: {
+    type: String,
+    required: true,
+  },
+
+  airline: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "AirlineAirport",
+  },
+
+  class_travel: {
+    type: String,
+    enum: ["Economy", "Business", "First", "Premium Economy"],
+    required: true,
+  },
+
   airport: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "AirlineAirport",
