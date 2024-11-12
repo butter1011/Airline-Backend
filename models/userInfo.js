@@ -13,7 +13,7 @@ const userInfoSchema = new mongoose.Schema(
       unique: true,
     },
 
-    phoneNumber: {
+    whatsappNumber: {
       type: String,
       unique: true,
     },
