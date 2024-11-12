@@ -3,12 +3,9 @@ const app = express();
 const connectDB = require("./utils/connectDB.js");
 const airlineRouter = require("./routes/routes.js");
 const bodyParser = require('body-parser');
-
-
 const PORT = process.env.PORT || 3000;
 // Connect to MongoDB
 connectDB();
-
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
