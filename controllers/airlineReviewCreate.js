@@ -1,13 +1,7 @@
 const AirlineReview = require("../models/airlineReviews");
-const { validationResult } = require("express-validator");
 
 exports.createAirlineReview = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const {
       reviewer,
       from,
