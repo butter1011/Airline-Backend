@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("UserInfo", userSchema);
 
-app.post("/auth/google", async (req, res) => {
+app.post("/auth/signin", async (req, res) => {
   const { name, identityValue } = {
     name: req.body.name,
     identityValue: req.body.id,
