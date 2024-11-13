@@ -1,7 +1,8 @@
 const UserInfo = require("../models/userInfo");
 
 const createUserInfo = async (req, res) => {
-  const { name, whatsappNumber, email } = req.body;
+  let { name, whatsappNumber, email } = req.body;
+  let existingUser = null;
 
   if (!email && !whatsappNumber) {
     return res.status(400).json({
@@ -12,7 +13,6 @@ const createUserInfo = async (req, res) => {
 
   try {
     // Check if user already exists
-    let existingUser;
     if (email) {
       existingUser = await UserInfo.findOne({ email: email });
     } else if (whatsappNumber) {
@@ -25,18 +25,20 @@ const createUserInfo = async (req, res) => {
       return res.json({ name: existingUser.name, userState: 1 });
     }
 
+    console.log("Creating new user", req.body);
     // Create new user if doesn't exist
-    const newUser = new UserInfo({
-      name,
-      email,
-      whatsappNumber,
+    let newUser = new UserInfo({
+      name: name,
+      email: email,
+      whatsappNumber: whatsappNumber,
     });
-
-    console.log(newUser);
-
+    console.log("New user", newUser);
     await newUser.save();
+    console.log("New user created");
+
     res.json({ name: newUser.name, userState: 0 });
   } catch (error) {
+    console.error("Error creating user:", error);
     res.status(500).json({ success: false, error: "Server error" });
   }
 };
