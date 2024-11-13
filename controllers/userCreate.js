@@ -17,7 +17,13 @@ const createUserInfo = async (req, res) => {
   try {
     // Check if user already exists
     let userInfo = await UserInfo.findOne({
-      $or: [{ email }, { whatsappNumber }],
+      $or: [
+        { email: email, email: { $exists: true, $ne: null } },
+        {
+          whatsappNumber: whatsappNumber,
+          whatsappNumber: { $exists: true, $ne: null },
+        },
+      ],
     });
 
     if (!userInfo) {

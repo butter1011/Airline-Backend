@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { createAirlineAirport, getAirlineAirport } = require("../controllers/airportAirlineCreate");
+const {
+  createAirlineAirport,
+  getAirlineAirport,
+} = require("../controllers/airportAirlineCreate");
 const { createUserInfo } = require("../controllers/userCreate");
 const { createAirportReview } = require("../controllers/airportReviewCreate");
 const { createAirlineReview } = require("../controllers/airlineReviewCreate");
