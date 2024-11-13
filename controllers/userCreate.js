@@ -1,11 +1,7 @@
 const UserInfo = require("../models/userInfo");
 
 const createUserInfo = async (req, res) => {
-  const { name, whatsappNumber, email } = {
-    name: req.body.name,
-    whatsappNumber: req.body.whatsappNumber,
-    email: req.body.email,
-  };
+  const { name, whatsappNumber, email } = req.body;
 
   if (!email && !whatsappNumber) {
     return res.status(400).json({
@@ -16,25 +12,33 @@ const createUserInfo = async (req, res) => {
 
   try {
     // Check if user already exists
-    let userInfo = await UserInfo.findOne({
-      $or: [{ email }, { whatsappNumber }],
+    let existingUser;
+    if (email) {
+      existingUser = await UserInfo.findOne({ email: email });
+    } else if (whatsappNumber) {
+      existingUser = await UserInfo.findOne({
+        whatsappNumber: whatsappNumber,
+      });
+    }
+
+    if (existingUser) {
+      return res.json({ name: existingUser.name, userState: 1 });
+    }
+
+    // Create new user if doesn't exist
+    const newUser = new UserInfo({
+      name,
+      email,
+      whatsappNumber,
     });
 
-    if (!userInfo) {
-      // Create new user if doesn't exist
-      userInfo = new UserInfo({
-        name,
-        email,
-        whatsappNumber,
-      });
+    console.log(newUser);
 
-      await userInfo.save();
-      res.json({ name: userInfo.name, userState: 0 });
-    } else {
-      res.json({ name: userInfo.name, userState: 1 });
-    }
+    await newUser.save();
+    res.json({ name: newUser.name, userState: 0 });
   } catch (error) {
-    res.status(401).json({ success: false, error: "Invalid token" });
+    res.status(500).json({ success: false, error: "Server error" });
   }
 };
+
 module.exports = { createUserInfo };
