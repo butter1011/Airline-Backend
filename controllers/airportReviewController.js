@@ -1,6 +1,6 @@
 const AirportReview = require("../models/airportReviewsSchema");
 
-exports.createAirportReview = async (req, res) => {
+const createAirportReview = async (req, res) => {
   try {
     const {
       reviewer,
@@ -116,3 +116,4 @@ exports.createAirportReview = async (req, res) => {
 //     res.status(500).json({ message: "Internal server error" });
 //   }
 // };
+module.exports = { createAirportReview };
