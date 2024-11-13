@@ -4,7 +4,7 @@ const AirlineAirport = require("../models/airlinePortListsSchema");
 
 const createAirlineAirport = async (req, res) => {
   try {
-    const { name, is_airline } = req.body;
+    const { name, isAirline } = req.body;
 
     // Check if an airline/airport with the same name already exists
     const existingAirlineAirport = await AirlineAirport.findOne({ name });
@@ -18,7 +18,7 @@ const createAirlineAirport = async (req, res) => {
 
     const newAirlineAirport = new AirlineAirport({
       name,
-      is_airline,
+      isAirline,
     });
 
     const savedAirlineAirport = await newAirlineAirport.save();
@@ -36,6 +36,7 @@ const createAirlineAirport = async (req, res) => {
     });
   }
 };
+
 const getAirlineAirport = async (req, res) => {
   try {
     const airlineAirports = await AirlineAirport.find();
@@ -49,6 +50,7 @@ const getAirlineAirport = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 module.exports = {
   createAirlineAirport,
   getAirlineAirport,

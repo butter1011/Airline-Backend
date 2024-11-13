@@ -1,9 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const { createAirlineAirport, getAirlineAirport } = require("../controllers/airportAirlineController");
+const {
+  createAirlineAirport,
+} = require("../controllers/airportAirlineController");
 const { createUserInfo } = require("../controllers/userInfoController");
-const { createAirportReview } = require("../controllers/airportReviewController");
-const { createAirlineReview } = require("../controllers/airlineReviewController");
+const {
+  createAirportReview,
+} = require("../controllers/airportReviewController");
+const {
+  createAirlineReview,
+} = require("../controllers/airlineReviewController");
 
 /// Post api
 router.post("/api/v1/user", createUserInfo);

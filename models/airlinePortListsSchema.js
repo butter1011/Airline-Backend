@@ -7,25 +7,25 @@ const airlineAirportSchema = new mongoose.Schema({
     trim: true,
   },
 
-  is_airline: {
+  isAirline: {
     type: Boolean,
     required: true,
   },
 
-  total_reviews: {
+  totalReviews: {
     type: Number,
     default: 0,
   },
 
-  first_class: {
+  firstClass: {
     type: Number,
   },
 
-  buiness_class: {
+  buinessClass: {
     type: Number,
   },
 
-  economy_class: {
+  economyClass: {
     type: Number,
   },
 

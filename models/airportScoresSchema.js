@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const airportScoreSchema = new mongoose.Schema({
-  object_id: {
+  objectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "AirlineAirport",
     required: true,
@@ -11,7 +11,7 @@ const airportScoreSchema = new mongoose.Schema({
     type: Number,
   },
 
-  wait_times: {
+  waitTimes: {
     type: Number,
   },
 
@@ -19,11 +19,11 @@ const airportScoreSchema = new mongoose.Schema({
     type: Number,
   },
 
-  ambience_comfort: {
+  ambienceComfort: {
     type: Number,
   },
 
-  food_beverage: {
+  foodBeverage: {
     type: Number,
   },
 

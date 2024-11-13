@@ -22,13 +22,13 @@ const airlineReviewSchema = new mongoose.Schema({
     ref: "AirlineAirport",
   },
 
-  class_travel: {
+  classTravel: {
     type: String,
     enum: ["Economy", "Business", "First", "Premium Economy"],
     required: true,
   },
 
-  departure_arrival: {
+  departureArrival: {
     type: Object,
     required: true,
   },
@@ -43,17 +43,17 @@ const airlineReviewSchema = new mongoose.Schema({
     required: true,
   },
 
-  onboard_service: {
+  onboardService: {
     type: Object,
     required: true,
   },
 
-  food_beverage: {
+  foodBeverage: {
     type: Object,
     required: true,
   },
 
-  entertainment_wifi: {
+  entertainmentWifi: {
     type: Object,
     required: true,
   },

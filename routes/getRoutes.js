@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { getAirlineAirport } = require("../controllers/airportAirlineController");
+const {
+  getAirlineAirport,
+} = require("../controllers/airportAirlineController");
 const { getUserInfo } = require("../controllers/userInfoController");
 
 /// Get api

@@ -1,19 +1,19 @@
 const AirlineReview = require("../models/airlineReviewsSchema");
 
-exports.createAirlineReview = async (req, res) => {
+const createAirlineReview = async (req, res) => {
   try {
     const {
       reviewer,
       from,
       to,
       airline,
-      class_travel,
-      departure_arrival,
+      classTravel,
+      departureArrival,
       comfort,
       cleanliness,
-      onboard_service,
-      food_beverage,
-      entertainment_wifi,
+      onboardService,
+      foodBeverage,
+      entertainmentWifi,
       comment,
     } = req.body;
 
@@ -22,13 +22,13 @@ exports.createAirlineReview = async (req, res) => {
       from,
       to,
       airline,
-      class_travel,
-      departure_arrival,
+      classTravel,
+      departureArrival,
       comfort,
       cleanliness,
-      onboard_service,
-      food_beverage,
-      entertainment_wifi,
+      onboardService,
+      foodBeverage,
+      entertainmentWifi,
       comment,
     });
 
@@ -118,3 +118,7 @@ exports.createAirlineReview = async (req, res) => {
 //     res.status(500).json({ message: "Internal server error" });
 //   }
 // };
+
+module.exports = {
+  createAirlineReview,
+};

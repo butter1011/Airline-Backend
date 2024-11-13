@@ -26,7 +26,7 @@ const userInfoSchema = new mongoose.Schema(
       required: false,
       default: 0,
     },
-    travel_history: {
+    travelHistory: {
       type: Object,
       required: false,
     },
@@ -34,7 +34,7 @@ const userInfoSchema = new mongoose.Schema(
       type: Object,
       required: false,
     },
-    profile_photo: {
+    profilePhoto: {
       type: String,
       required: false,
     },
@@ -42,7 +42,7 @@ const userInfoSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    favorite_airlines: {
+    favoriteAirlines: {
       type: String,
       required: false,
     },
