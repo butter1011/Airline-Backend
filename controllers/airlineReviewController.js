@@ -1,4 +1,4 @@
-const AirlineReview = require("../models/airlineReviews");
+const AirlineReview = require("../models/airlineReviewsSchema");
 
 exports.createAirlineReview = async (req, res) => {
   try {

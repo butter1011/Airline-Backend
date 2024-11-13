@@ -1,4 +1,4 @@
-const AirportReview = require("../models/airportReviews");
+const AirportReview = require("../models/airportReviewsSchema");
 
 exports.createAirportReview = async (req, res) => {
   try {

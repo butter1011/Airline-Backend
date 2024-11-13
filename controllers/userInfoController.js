@@ -1,4 +1,4 @@
-const UserInfo = require("../models/userInfo");
+const UserInfo = require("../models/userInfoSchema");
 
 const createUserInfo = async (req, res) => {
   let { name, whatsappNumber, email } = req.body;
@@ -32,9 +32,7 @@ const createUserInfo = async (req, res) => {
       email: email,
       whatsappNumber: whatsappNumber,
     });
-    console.log("New user", newUser);
     await newUser.save();
-    console.log("New user created");
 
     res.json({ name: newUser.name, userState: 0 });
   } catch (error) {
@@ -43,4 +41,19 @@ const createUserInfo = async (req, res) => {
   }
 };
 
-module.exports = { createUserInfo };
+// Middleware function to get a single user info
+const getUserInfo = async (req, res) => {
+  let userInfo;
+  try {
+    userInfo = await UserInfo.findById(req.params.id);
+    if (userInfo == null) {
+      return res.status(404).json({ message: "User not found" });
+    }
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+
+  res.json(userInfo);
+};
+
+module.exports = { createUserInfo, getUserInfo };
