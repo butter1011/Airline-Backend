@@ -37,6 +37,11 @@ const airlineAirportSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+
+  location: {
+    type: String,
+    required: false,
+  },
 });
 
 const AirlineAirport = mongoose.model("AirlineAirport", airlineAirportSchema);
