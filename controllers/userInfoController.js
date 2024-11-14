@@ -22,7 +22,7 @@ const createUserInfo = async (req, res) => {
     }
 
     if (existingUser) {
-      return res.json({ name: existingUser.name, userState: 1 });
+      return res.json({ existingUser, userState: 1 });
     }
 
     console.log("Creating new user", req.body);
