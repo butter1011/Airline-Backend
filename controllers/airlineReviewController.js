@@ -44,18 +44,16 @@ const createAirlineReview = async (req, res) => {
   }
 };
 
-// exports.getAirlineReviews = async (req, res) => {
-//   try {
-//     const reviews = await AirlineReview.find()
-//       .populate("reviewer", "username")
-//       .populate("airline", "name");
+const getAirlineReviews = async (req, res) => {
+  try {
+    const reviews = await AirlineReview.find()
 
-//     res.status(200).json(reviews);
-//   } catch (error) {
-//     console.error("Error fetching airline reviews:", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
+    res.status(200).json(reviews);
+  } catch (error) {
+    console.error("Error fetching airline reviews:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 // exports.getAirlineReviewById = async (req, res) => {
 //   try {
@@ -121,4 +119,5 @@ const createAirlineReview = async (req, res) => {
 
 module.exports = {
   createAirlineReview,
+  getAirlineReviews,
 };
