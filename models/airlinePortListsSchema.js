@@ -12,16 +12,6 @@ const airlineAirportSchema = new mongoose.Schema({
     required: true,
   },
 
-  iataCode: {
-    type: String,
-    required: true,
-  },
-
-  location: {
-    type: String,
-    required: true,
-  },
-
   totalReviews: {
     type: Number,
     default: 0,

@@ -19,8 +19,6 @@ const createAirlineAirport = async (req, res) => {
     const newAirlineAirport = new AirlineAirport({
       name,
       isAirline,
-      iataCode,
-      location,
     });
 
     const savedAirlineAirport = await newAirlineAirport.save();
