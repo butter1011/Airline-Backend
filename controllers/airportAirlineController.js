@@ -53,8 +53,8 @@ const getAirlineAirport = async (req, res) => {
 
 const updateAirlineAirport = async (req, res) => {
   try {
-    const { id } = req.params;
     const {
+      id,
       name,
       isAirline,
       totalReviews,
@@ -67,7 +67,7 @@ const updateAirlineAirport = async (req, res) => {
     } = req.body;
 
     const updatedAirlineAirport = await AirlineAirport.findByIdAndUpdate(
-      { _id: id },
+      id,
       {
         name,
         isAirline,
@@ -76,7 +76,7 @@ const updateAirlineAirport = async (req, res) => {
         buinessClass,
         economyClass,
         pey,
-        overall,
+        overall,  
         location,
       },
       { new: true, runValidators: true }
