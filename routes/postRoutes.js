@@ -13,7 +13,7 @@ const {
 
 /// Post api
 router.post("/api/v1/user", createUserInfo);
-router.post("/api/v1/airline-airport/review", createAirlineReview);
+router.post("/api/v1/airline-review", createAirlineReview);
 
 /// Unused API
 router.post("/api/v1/airport-review", createAirportReview);
