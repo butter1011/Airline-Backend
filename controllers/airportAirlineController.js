@@ -67,7 +67,7 @@ const updateAirlineAirport = async (req, res) => {
     } = req.body;
 
     const updatedAirlineAirport = await AirlineAirport.findByIdAndUpdate(
-      id,
+      { _id: id },
       {
         name,
         isAirline,
