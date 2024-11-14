@@ -4,7 +4,7 @@ const AirlineAirport = require("../models/airlinePortListsSchema");
 
 const createAirlineAirport = async (req, res) => {
   try {
-    const { name, isAirline } = req.body;
+    const { name, isAirline, iataCode, location } = req.body;
 
     // Check if an airline/airport with the same name already exists
     const existingAirlineAirport = await AirlineAirport.findOne({ name });
@@ -19,6 +19,8 @@ const createAirlineAirport = async (req, res) => {
     const newAirlineAirport = new AirlineAirport({
       name,
       isAirline,
+      iataCode,
+      location,
     });
 
     const savedAirlineAirport = await newAirlineAirport.save();
