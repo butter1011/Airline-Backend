@@ -34,7 +34,7 @@ const createUserInfo = async (req, res) => {
     });
     await newUser.save();
 
-    res.json({ name: newUser.name, userState: 0 });
+    res.json({ newUser, userState: 0 });
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({ success: false, error: "Server error" });
