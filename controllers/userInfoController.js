@@ -2,6 +2,7 @@ const UserInfo = require("../models/userInfoSchema");
 
 const createUserInfo = async (req, res) => {
   let { name, whatsappNumber, email } = req.body;
+
   let existingUser = null;
 
   if (!email && !whatsappNumber) {
@@ -22,19 +23,19 @@ const createUserInfo = async (req, res) => {
     }
 
     if (existingUser) {
-      return res.json({ existingUser, userState: 1 });
+      return res.json({ userData: existingUser, userState: 1 });
     }
 
-    console.log("Creating new user", req.body);
     // Create new user if doesn't exist
     let newUser = new UserInfo({
       name: name,
       email: email,
       whatsappNumber: whatsappNumber,
     });
+    console.log("🏀🏀🏀", newUser);
     await newUser.save();
 
-    res.json({ newUser, userState: 0 });
+    res.json({ userData: newUser, userState: 0 });
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({ success: false, error: "Server error" });
@@ -56,4 +57,24 @@ const getUserInfo = async (req, res) => {
   res.json(userInfo);
 };
 
-module.exports = { createUserInfo, getUserInfo };
+const editUserInfo = async (req, res) => {
+  let { name, bio, _id } = req.body;
+  let editingUser = null;
+
+  try {
+    // Check if user already exists
+    editingUser = await UserInfo.findOne({ _id: _id });
+    // Create new user if doesn't exist
+    editingUser.name = name;
+    editingUser.bio = bio;
+
+    await editingUser.save();
+    console.log("🏀🏀🏀", editingUser);
+    res.json({ userData: editingUser, userState: 1 });
+  } catch (error) {
+    console.error("Error editingUser:", error);
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+};
+
+module.exports = { createUserInfo, getUserInfo, editUserInfo };
