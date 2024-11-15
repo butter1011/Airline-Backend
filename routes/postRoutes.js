@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {
-  createAirlineAirport,
+  createAirlineAirport, updateAirlineAirport
 } = require("../controllers/airportAirlineController");
 const {
   createUserInfo,
@@ -21,4 +21,12 @@ router.post("/api/v1/airline-airport", createAirlineAirport);
 router.post("/api/v1/airport-review", createAirportReview);
 router.post("/api/v1/airline-review", createAirlineReview);
 
+/// Unused API
+router.post("/api/v1/airport-review", createAirportReview);
+
+// Postman API
+router.post("/api/v1/airline-airport/create", createAirlineAirport);
+router.post("/api/v1/airline-airport/update", updateAirlineAirport);
+
 module.exports = router;
+
