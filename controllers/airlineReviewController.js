@@ -1,5 +1,6 @@
+const AirlineAirport = require("../models/airlinePortListsSchema");
 const AirlineReview = require("../models/airlineReviewsSchema");
-
+const UserInfo = require("../models/userInfoSchema");
 const createAirlineReview = async (req, res) => {
   try {
     const {
@@ -44,19 +45,48 @@ const createAirlineReview = async (req, res) => {
   }
 };
 
-// exports.getAirlineReviews = async (req, res) => {
-//   try {
-//     const reviews = await AirlineReview.find()
-//       .populate("reviewer", "username")
-//       .populate("airline", "name");
+const getAirlineReviews = async (req, res) => {
+  try {
+    const reviews = await AirlineReview.find()
+      .populate({
+        path: "reviewer",
+        select: "name profilePhoto",
+        model: UserInfo,
+      })
+      .populate({
+        path: "from to airline",
+        select: "name location",
+        model: AirlineAirport,
+      });
 
-//     res.status(200).json(reviews);
-//   } catch (error) {
-//     console.error("Error fetching airline reviews:", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
+    const formattedReviews = reviews.map((review) => ({
+      id: review._id,
+      reviewer: {
+        name: review.reviewer.name,
+        profilePhoto: review.reviewer.profilePhoto,
+      },
+      from: {
+        name: review.from.name,
+        country: review.from.location,
+      },
+      to: {
+        name: review.to.name,
+        country: review.to.location,
+      },
+      airline: {
+        name: review.airline.name,
+      },
+      classTravel: review.classTravel,
+      comment: review.comment,
+      date: review.date,
+    }));
 
+    res.status(200).json(formattedReviews);
+  } catch (error) {
+    console.error("Error fetching airline reviews:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 // exports.getAirlineReviewById = async (req, res) => {
 //   try {
 //     const review = await AirlineReview.findById(req.params.id)
@@ -121,4 +151,5 @@ const createAirlineReview = async (req, res) => {
 
 module.exports = {
   createAirlineReview,
+  getAirlineReviews,
 };
