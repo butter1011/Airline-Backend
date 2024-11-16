@@ -8,18 +8,21 @@ const airlineReviewSchema = new mongoose.Schema({
   },
 
   from: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "AirlineAirport",
     required: true,
   },
 
   to: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "AirlineAirport",
     required: true,
   },
 
   airline: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "AirlineAirport",
+    required: true,
   },
 
   classTravel: {

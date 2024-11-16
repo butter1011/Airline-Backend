@@ -51,7 +51,60 @@ const getAirlineAirport = async (req, res) => {
   }
 };
 
+const updateAirlineAirport = async (req, res) => {
+  try {
+    const {
+      id,
+      name,
+      isAirline,
+      totalReviews,
+      firstClass,
+      buinessClass,
+      economyClass,
+      pey,
+      overall,
+      location,
+    } = req.body;
+
+    const updatedAirlineAirport = await AirlineAirport.findByIdAndUpdate(
+      id,
+      {
+        name,
+        isAirline,
+        totalReviews,
+        firstClass,
+        buinessClass,
+        economyClass,
+        pey,
+        overall,  
+        location,
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedAirlineAirport) {
+      return res.status(404).json({
+        success: false,
+        message: "Airline/Airport not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: updatedAirlineAirport,
+      message: "Airline/Airport updated successfully",
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Error updating Airline/Airport",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createAirlineAirport,
   getAirlineAirport,
+  updateAirlineAirport,
 };
