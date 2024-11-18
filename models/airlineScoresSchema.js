@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
 
 const airlineScoreSchema = new mongoose.Schema({
-  objectId: {
+  airlineId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "AirlineAirport",
     required: true,
+    unique: true,
   },
 
   departureArrival: {
@@ -29,6 +30,11 @@ const airlineScoreSchema = new mongoose.Schema({
 
   entertainmentWifi: {
     type: Number,
+  },
+
+  count: {
+    type: Number,
+    default: 0,
   },
 });
 

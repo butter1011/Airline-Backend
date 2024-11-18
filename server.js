@@ -1,14 +1,14 @@
 const express = require("express");
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const http = require('http');
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const http = require("http");
 
 const app = express();
 const server = http.createServer(app);
 const connectDB = require("./utils/connectDB.js");
 const postApi = require("./routes/postRoutes.js");
 const getApi = require("./routes/getRoutes.js");
-const { initWebSocket } = require("./controllers/airportAirlineController");
+const { initWebSocket } = require("./controllers/airlineReviewController.js");
 
 const PORT = process.env.PORT || 3000;
 

@@ -32,7 +32,6 @@ const createUserInfo = async (req, res) => {
       email: email,
       whatsappNumber: whatsappNumber,
     });
-    console.log("🏀🏀🏀", newUser);
     await newUser.save();
 
     res.json({ userData: newUser, userState: 0 });
@@ -69,7 +68,6 @@ const editUserInfo = async (req, res) => {
     editingUser.bio = bio;
 
     await editingUser.save();
-    console.log("🏀🏀🏀", editingUser);
     res.json({ userData: editingUser, userState: 1 });
   } catch (error) {
     console.error("Error editingUser:", error);
