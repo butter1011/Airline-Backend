@@ -4,9 +4,7 @@ const createAirportReview = async (req, res) => {
   try {
     const {
       reviewer,
-      from,
-      to,
-      airport,
+      airline,
       accessibility,
       waitTimes,
       helpfulness,
@@ -18,9 +16,7 @@ const createAirportReview = async (req, res) => {
 
     const newAirportReview = new AirportReview({
       reviewer,
-      from,
-      to,
-      airport,
+      airline,
       accessibility,
       waitTimes,
       helpfulness,
