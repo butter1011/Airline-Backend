@@ -43,7 +43,7 @@ const airlineAirportSchema = new mongoose.Schema({
     required: false,
   },
 
-  is_increasing: {
+  isIncreasing: {
     type: Boolean,
     default: false,
   },

@@ -112,8 +112,8 @@ const calculateAirlineScores = async (airlineReview) => {
     const previousOverallScore = airlineAirport.overall;
     airlineAirport.overall = updateOverallScore(airlineAirport);
 
-    // Update is_increasing flag based on overall score change
-    airlineAirport.is_increasing =
+    // Update isIncreasing flag based on overall score change
+    airlineAirport.isIncreasing =
       airlineAirport.overall > previousOverallScore;
     await airlineAirport.save();
   }
@@ -208,8 +208,8 @@ const calculateAirportScores = async (airportReview) => {
     if (!isNaN(newOverallScore)) {
       airlineAirport.overall = newOverallScore;
 
-      // Update is_increasing flag based on overall score change
-      airlineAirport.is_increasing = newOverallScore > previousOverallScore;
+      // Update isIncreasing flag based on overall score change
+      airlineAirport.isIncreasing = newOverallScore > previousOverallScore;
       await airlineAirport.save();
     } else {
       console.error("Invalid overall score calculated:", newOverallScore);
