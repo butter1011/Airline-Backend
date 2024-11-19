@@ -20,6 +20,10 @@ const createAirlineReview = async (req, res) => {
       comment,
     } = req.body;
 
+    console.log("-------❤❤❤❤-------");
+    console.log("--------------", req.body);
+    console.log("--------------");
+
     const newAirlineReview = new AirlineReview({
       reviewer,
       from,
@@ -36,8 +40,14 @@ const createAirlineReview = async (req, res) => {
     });
 
     const savedReview = await newAirlineReview.save();
+    console.log("--------------");
+    console.log("--------------", savedReview);
+    console.log("--------------");
 
     const airlineScore = await calculateAirlineScores(savedReview);
+    console.log("--------------");
+    console.log("--------------", airlineScore);
+    console.log("--------------");
 
     await airlineScore.save();
 
