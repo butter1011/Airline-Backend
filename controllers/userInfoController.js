@@ -77,4 +77,28 @@ const editUserInfo = async (req, res) => {
   }
 };
 
-module.exports = { createUserInfo, getUserInfo, editUserInfo };
+const badgeEditUserInfo = async (req, res) => {
+  let { selectedbadges, _id } = req.body;
+  let badgeEditingUser = null;
+  console.log("🌹🌹🌹", selectedbadges);
+  try {
+    // Check if user already exists
+    badgeEditingUser = await UserInfo.findOne({ _id: _id });
+    // Create new user if doesn't exist
+    badgeEditingUser.selectedbadges = selectedbadges;
+
+    await badgeEditingUser.save();
+    console.log("🏀🏀🏀", badgeEditingUser);
+    res.json({ userData: badgeEditingUser, userState: 1 });
+  } catch (error) {
+    console.error("Error editingUser:", error);
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+};
+
+module.exports = {
+  createUserInfo,
+  getUserInfo,
+  editUserInfo,
+  badgeEditUserInfo,
+};
