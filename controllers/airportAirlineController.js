@@ -1,22 +1,6 @@
 /// Create the Airline and Airport api
 /// Check if the airline/airport already exists
-const WebSocket = require("ws");
 const AirlineAirport = require("../models/airlinePortListsSchema");
-
-let wss;
-
-const initWebSocket = (server) => {
-  wss = new WebSocket.Server({ server });
-
-  wss.on("connection", (ws) => {
-    console.log("Client connected");
-
-    ws.on("close", () => {
-      console.log("Client disconnected");
-    });
-  });
-};
-
 const createAirlineAirport = async (req, res) => {
   try {
     const { name, isAirline } = req.body;
@@ -54,7 +38,7 @@ const createAirlineAirport = async (req, res) => {
 
 const getAirlineAirport = async (req, res) => {
   try {
-    const airlineAirports = await AirlineAirport.find();
+    const airlineAirports = await AirlineAirport.find().sort({ overall: -1 });
 
     res.status(200).json({
       message: "Airline/Airport data retrieved successfully",
@@ -65,49 +49,6 @@ const getAirlineAirport = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
-const deleteAirlineAirport = async (req, res) => {
-  try {
-    const { id } = req.body;
-    console.log(`id---------->${id}`);
-
-    const deletedAirlineAirport = await AirlineAirport.findByIdAndDelete(id);
-
-    if (!deletedAirlineAirport) {
-      return res.status(404).json({
-        success: false,
-        message: "Airline/Airport not found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "Airline/Airport deleted successfully",
-    });
-
-    // Send WebSocket update
-    if (wss && wss.clients) {
-      const updatedAirlineAirports = await AirlineAirport.find();
-      wss.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(
-            JSON.stringify({
-              type: "airlineAirport",
-              data: updatedAirlineAirports,
-            })
-          );
-        }
-      });
-    }
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: "Error deleting Airline/Airport",
-      error: error.message,
-    });
-  }
-};
-
 const updateAirlineAirport = async (req, res) => {
   try {
     const {
@@ -161,9 +102,7 @@ const updateAirlineAirport = async (req, res) => {
 };
 
 module.exports = {
-  initWebSocket,
   createAirlineAirport,
   getAirlineAirport,
   updateAirlineAirport,
-  deleteAirlineAirport,
 };

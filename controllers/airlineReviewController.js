@@ -1,6 +1,20 @@
 const AirlineAirport = require("../models/airlinePortListsSchema");
 const AirlineReview = require("../models/airlineReviewsSchema");
 const UserInfo = require("../models/userInfoSchema");
+const { calculateAirlineScores } = require("./calculatorController");
+const WebSocket = require("ws");
+let wss;
+const initWebSocket = (server) => {
+  wss = new WebSocket.Server({ server });
+
+  wss.on("connection", (ws) => {
+    console.log("Client connected");
+
+    ws.on("close", () => {
+      console.log("Client disconnected");
+    });
+  });
+};
 const createAirlineReview = async (req, res) => {
   try {
     const {
@@ -34,6 +48,25 @@ const createAirlineReview = async (req, res) => {
     });
 
     const savedReview = await newAirlineReview.save();
+
+    const airlineScore = await calculateAirlineScores(savedReview);
+
+    await airlineScore.save();
+
+    // Send WebSocket update
+    if (wss && wss.clients) {
+      const updatedAirlineAirports = await AirlineAirport.find();
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(
+            JSON.stringify({
+              type: "airlineAirport",
+              data: updatedAirlineAirports,
+            })
+          );
+        }
+      });
+    }
 
     res.status(201).json({
       message: "Airline review created successfully",
@@ -87,69 +120,8 @@ const getAirlineReviews = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-// exports.getAirlineReviewById = async (req, res) => {
-//   try {
-//     const review = await AirlineReview.findById(req.params.id)
-//       .populate("reviewer", "username")
-//       .populate("airline", "name");
-
-//     if (!review) {
-//       return res.status(404).json({ message: "Airline review not found" });
-//     }
-
-//     res.status(200).json(review);
-//   } catch (error) {
-//     console.error("Error fetching airline review:", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
-
-// exports.updateAirlineReview = async (req, res) => {
-//   try {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//       return res.status(400).json({ errors: errors.array() });
-//     }
-
-//     const updatedReview = await AirlineReview.findByIdAndUpdate(
-//       req.params.id,
-//       req.body,
-//       { new: true, runValidators: true }
-//     );
-
-//     if (!updatedReview) {
-//       return res.status(404).json({ message: "Airline review not found" });
-//     }
-
-//     res.status(200).json({
-//       message: "Airline review updated successfully",
-//       review: updatedReview,
-//     });
-//   } catch (error) {
-//     console.error("Error updating airline review:", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
-
-// exports.deleteAirlineReview = async (req, res) => {
-//   try {
-//     const deletedReview = await AirlineReview.findByIdAndDelete(req.params.id);
-
-//     if (!deletedReview) {
-//       return res.status(404).json({ message: "Airline review not found" });
-//     }
-
-//     res.status(200).json({
-//       message: "Airline review deleted successfully",
-//       review: deletedReview,
-//     });
-//   } catch (error) {
-//     console.error("Error deleting airline review:", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
-
 module.exports = {
+  initWebSocket,
   createAirlineReview,
   getAirlineReviews,
 };
