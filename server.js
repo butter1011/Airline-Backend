@@ -1,9 +1,10 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const http = require("http");
+
 const app = express();
-const server = http.createServer(app);
+const WebSocketServer = require("ws");
+const wss = new WebSocketServer({ port: 8080 });
 
 const { initWebSocket } = require("./utils/websocket.js");
 const connectDB = require("./utils/connectDB.js");
@@ -26,6 +27,8 @@ app.use(postApi);
 app.use(getApi);
 
 // Initialize WebSocket
-initWebSocket(server);
+initWebSocket(wss);
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+E8LAFie1sGKdHMG5;
