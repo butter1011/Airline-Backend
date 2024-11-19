@@ -1,6 +1,52 @@
 const AirlineAirport = require("../models/airlinePortListsSchema");
 const AirlineReview = require("../models/airlineReviewsSchema");
 const UserInfo = require("../models/userInfoSchema");
+const { countries, continents } = require("countries-list");
+const locationToContinentMap = require("./city.json");
+
+const getContinentForLocation = (location) => {
+  if (!location) {
+    console.log("Location is undefined or null");
+    return "Unknown";
+  }
+
+  const normalizedLocation = location.trim().toLowerCase();
+  console.log(`Normalized location: ${normalizedLocation}`);
+
+  // Check our custom map first
+  if (locationToContinentMap[normalizedLocation]) {
+    console.log(
+      `Custom map match found: ${normalizedLocation} (${locationToContinentMap[normalizedLocation]})`
+    );
+    return locationToContinentMap[normalizedLocation];
+  }
+
+  // Check countries from countries-list
+  for (const [code, country] of Object.entries(countries)) {
+    if (country.name.toLowerCase() === normalizedLocation) {
+      const continent = continents[country.continent];
+      console.log(`Country match found: ${country.name} (${continent})`);
+      return continent;
+    }
+  }
+
+  // If no exact match, try partial matching
+  for (const [code, country] of Object.entries(countries)) {
+    if (
+      country.name.toLowerCase().includes(normalizedLocation) ||
+      normalizedLocation.includes(country.name.toLowerCase())
+    ) {
+      const continent = continents[country.continent];
+      console.log(
+        `Partial country match found: ${country.name} (${continent})`
+      );
+      return continent;
+    }
+  }
+
+  console.log(`No match found for: ${normalizedLocation}`);
+  return "Unknown";
+};
 const createAirlineReview = async (req, res) => {
   try {
     const {
@@ -54,7 +100,7 @@ const getAirlineReviews = async (req, res) => {
         model: UserInfo,
       })
       .populate({
-        path: "from to airline",
+        path: "airline",
         select: "name location",
         model: AirlineAirport,
       });
@@ -82,6 +128,45 @@ const getAirlineReviews = async (req, res) => {
     }));
 
     res.status(200).json(formattedReviews);
+  } catch (error) {
+    console.error("Error fetching airline reviews:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const gettingReviewData = async (req, res) => {
+  try {
+    console.log(req.body);
+    const reviews = await AirlineReview.find()
+      .populate({
+        path: "reviewer",
+        select: "_id",
+        model: UserInfo,
+      })
+      .populate({
+        path: "airline",
+        select: "name location isAirline overall",
+        model: AirlineAirport,
+      })
+      .find({ reviewer: req.body._id });
+    //   res.status(200).json(reviews);
+    console.log(reviews);
+    const formattedReviews = reviews.map((review) => ({
+      id: review._id,
+
+      location: review.airline.location,
+      airline: review.airline.name,
+      isAirline: review.airline.isAirline,
+      overall: review.airline.overall,
+      classTravel: review.classTravel,
+      userId: review.reviewer._id,
+      continent: getContinentForLocation(review.airline.location),
+      // comment: review.comment,
+      date: review.date,
+    }));
+
+    console.log(formattedReviews);
+    res.status(200).json({ data: formattedReviews });
   } catch (error) {
     console.error("Error fetching airline reviews:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -152,4 +237,5 @@ const getAirlineReviews = async (req, res) => {
 module.exports = {
   createAirlineReview,
   getAirlineReviews,
+  gettingReviewData,
 };
