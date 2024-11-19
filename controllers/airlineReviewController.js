@@ -2,7 +2,8 @@ const AirlineAirport = require("../models/airlinePortListsSchema");
 const AirlineReview = require("../models/airlineReviewsSchema");
 const UserInfo = require("../models/userInfoSchema");
 const { calculateAirlineScores } = require("./calculatorController");
-const { broadcastUpdate } = require("../utils/websocket");
+const { getWebSocketInstance } = require("../utils/websocket");
+const WebSocket = require("ws");
 const createAirlineReview = async (req, res) => {
   try {
     const {
@@ -42,7 +43,20 @@ const createAirlineReview = async (req, res) => {
 
     // Send WebSocket update
     const updatedAirlineAirports = await AirlineAirport.find();
-    broadcastUpdate("airlineAirport", updatedAirlineAirports);
+    const wss = getWebSocketInstance();
+
+    if (wss) {
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(
+            JSON.stringify({
+              type: "airlineAirport",
+              data: updatedAirlineAirports,
+            })
+          );
+        }
+      });
+    }
 
     res.status(201).json({
       message: "Airline review created successfully",

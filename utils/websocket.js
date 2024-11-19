@@ -1,8 +1,16 @@
 const WebSocket = require("ws");
-let wss;
+let wssInstance;
+const setWebSocketInstance = (instance) => {
+  wssInstance = instance;
+};
+
+const getWebSocketInstance = () => {
+  return wssInstance;
+};
 
 const initWebSocket = (server) => {
   wss = new WebSocket.Server({ server });
+  setWebSocketInstance(wss);
 
   wss.on("connection", (ws) => {
     console.log("Client connected");
@@ -13,14 +21,9 @@ const initWebSocket = (server) => {
   });
 };
 
-const broadcastUpdate = (type, data) => {
-  if (wss && wss.clients) {
-    wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({ type, data }));
-      }
-    });
-  }
+module.exports = {
+  initWebSocket,
+  getWebSocketInstance,
+  setWebSocketInstance,
+  initWebSocket,
 };
-
-module.exports = { initWebSocket, broadcastUpdate };
