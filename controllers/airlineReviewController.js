@@ -151,22 +151,38 @@ const gettingReviewData = async (req, res) => {
       .find({ reviewer: req.body._id });
     //   res.status(200).json(reviews);
     console.log(reviews);
-    const formattedReviews = reviews.map((review) => ({
-      id: review._id,
 
-      location: review.airline.location,
-      airline: review.airline.name,
-      isAirline: review.airline.isAirline,
-      overall: review.airline.overall,
-      classTravel: review.classTravel,
-      userId: review.reviewer._id,
-      continent: getContinentForLocation(review.airline.location),
-      // comment: review.comment,
-      date: review.date,
-    }));
+    const reviewsByContinent = {};
 
-    console.log(formattedReviews);
-    res.status(200).json({ data: formattedReviews });
+    reviews.forEach((review) => {
+      const location = review.airline?.location || "Unknown";
+      console.log(`Processing location: ${location}`);
+      const continent = getContinentForLocation(location);
+
+      const reviewData = {
+        id: review._id,
+        location: location,
+        continent: continent,
+        airline: review.airline?.name || "Unknown",
+        isAirline: review.airline?.isAirline || false,
+        overall: review.airline?.overall || 0,
+        classTravel: review.classTravel,
+        userId: review.reviewer?._id,
+        date: review.date,
+      };
+
+      if (!reviewsByContinent[continent]) {
+        reviewsByContinent[continent] = {
+          continent: continent,
+          data: [],
+        };
+      }
+      reviewsByContinent[continent].data.push(reviewData);
+    });
+    console.log("💚😍", reviewsByContinent);
+    const formattedReviews = Object.values(reviewsByContinent);
+    console.log("💚😍", formattedReviews);
+    res.status(200).json({ formattedReviews: formattedReviews });
   } catch (error) {
     console.error("Error fetching airline reviews:", error);
     res.status(500).json({ message: "Internal server error" });
