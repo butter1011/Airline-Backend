@@ -1,12 +1,15 @@
+const AirlineAirport = require("../models/airlinePortListsSchema");
 const AirportReview = require("../models/airportReviewsSchema");
+const AirportScore = require("../models/airportScoresSchema");
+const { calculateAirportScores } = require("./calculatorController");
+const { getWebSocketInstance } = require("../utils/websocket");
 
 const createAirportReview = async (req, res) => {
   try {
     const {
       reviewer,
-      from,
-      to,
       airport,
+      airline,
       accessibility,
       waitTimes,
       helpfulness,
@@ -18,9 +21,8 @@ const createAirportReview = async (req, res) => {
 
     const newAirportReview = new AirportReview({
       reviewer,
-      from,
-      to,
       airport,
+      airline,
       accessibility,
       waitTimes,
       helpfulness,
@@ -32,6 +34,31 @@ const createAirportReview = async (req, res) => {
 
     const savedReview = await newAirportReview.save();
 
+    let airportScore = await AirportScore.findOne({ airportId: airport });
+    if (!airportScore) {
+      airportScore = new AirportScore({ airportId: airport });
+    }
+
+    airportScore = await calculateAirportScores(savedReview, airportScore);
+    await airportScore.save();
+
+    // Send WebSocket update
+    const updatedAirlineAirports = await AirlineAirport.find();
+    const wss = getWebSocketInstance();
+
+    if (wss) {
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(
+            JSON.stringify({
+              type: "airlineAirport",
+              data: updatedAirlineAirports,
+            })
+          );
+        }
+      });
+    }
+
     res.status(201).json({
       message: "Airport review created successfully",
       review: savedReview,
@@ -42,78 +69,4 @@ const createAirportReview = async (req, res) => {
   }
 };
 
-// exports.getAirportReviews = async (req, res) => {
-//   try {
-//     const reviews = await AirportReview.find()
-//       .populate("reviewer", "username")
-//       .populate("airport", "name");
-
-//     res.status(200).json(reviews);
-//   } catch (error) {
-//     console.error("Error fetching airport reviews:", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
-
-// exports.getAirportReviewById = async (req, res) => {
-//   try {
-//     const review = await AirportReview.findById(req.params.id)
-//       .populate("reviewer", "username")
-//       .populate("airport", "name");
-
-//     if (!review) {
-//       return res.status(404).json({ message: "Airport review not found" });
-//     }
-
-//     res.status(200).json(review);
-//   } catch (error) {
-//     console.error("Error fetching airport review:", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
-
-// exports.updateAirportReview = async (req, res) => {
-//   try {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//       return res.status(400).json({ errors: errors.array() });
-//     }
-
-//     const updatedReview = await AirportReview.findByIdAndUpdate(
-//       req.params.id,
-//       req.body,
-//       { new: true, runValidators: true }
-//     );
-
-//     if (!updatedReview) {
-//       return res.status(404).json({ message: "Airport review not found" });
-//     }
-
-//     res.status(200).json({
-//       message: "Airport review updated successfully",
-//       review: updatedReview,
-//     });
-//   } catch (error) {
-//     console.error("Error updating airport review:", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
-
-// exports.deleteAirportReview = async (req, res) => {
-//   try {
-//     const deletedReview = await AirportReview.findByIdAndDelete(req.params.id);
-
-//     if (!deletedReview) {
-//       return res.status(404).json({ message: "Airport review not found" });
-//     }
-
-//     res.status(200).json({
-//       message: "Airport review deleted successfully",
-//       review: deletedReview,
-//     });
-//   } catch (error) {
-//     console.error("Error deleting airport review:", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
 module.exports = { createAirportReview };

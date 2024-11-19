@@ -1,16 +1,16 @@
-const express = require("express");
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const http = require('http');
-
-const app = express();
-const server = http.createServer(app);
-const connectDB = require("./utils/connectDB.js");
-const postApi = require("./routes/postRoutes.js");
-const getApi = require("./routes/getRoutes.js");
-const { initWebSocket } = require("./controllers/airportAirlineController");
-
 const PORT = process.env.PORT || 3000;
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const app = express();
+
+const { initWebSocket, setWebSocketInstance } = require("./utils/websocket.js");
+const connectDB = require("./utils/connectDB.js");
+const WebSocketServer = require("ws");
+const wss = new WebSocketServer.Server({ port: 8080 });
+
+const getApi = require("./routes/getRoutes.js");
+const postApi = require("./routes/postRoutes.js");
 
 // Connect to MongoDB
 connectDB();
@@ -24,7 +24,8 @@ app.use(express.json());
 app.use(postApi);
 app.use(getApi);
 
-// Initialize WebSocket
+const server = app.listen(PORT, () =>
+  console.log(`Server running on port ${PORT}`)
+);
 initWebSocket(server);
-
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+setWebSocketInstance(wss);
