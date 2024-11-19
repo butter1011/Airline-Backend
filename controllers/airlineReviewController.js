@@ -2,19 +2,7 @@ const AirlineAirport = require("../models/airlinePortListsSchema");
 const AirlineReview = require("../models/airlineReviewsSchema");
 const UserInfo = require("../models/userInfoSchema");
 const { calculateAirlineScores } = require("./calculatorController");
-const WebSocket = require("ws");
-let wss;
-const initWebSocket = (server) => {
-  wss = new WebSocket.Server({ server });
-
-  wss.on("connection", (ws) => {
-    console.log("Client connected");
-
-    ws.on("close", () => {
-      console.log("Client disconnected");
-    });
-  });
-};
+const { broadcastUpdate } = require("../utils/websocket");
 const createAirlineReview = async (req, res) => {
   try {
     const {
@@ -54,19 +42,8 @@ const createAirlineReview = async (req, res) => {
     await airlineScore.save();
 
     // Send WebSocket update
-    if (wss && wss.clients) {
-      const updatedAirlineAirports = await AirlineAirport.find();
-      wss.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(
-            JSON.stringify({
-              type: "airlineAirport",
-              data: updatedAirlineAirports,
-            })
-          );
-        }
-      });
-    }
+    const updatedAirlineAirports = await AirlineAirport.find();
+    broadcastUpdate("airlineAirport", updatedAirlineAirports);
 
     res.status(201).json({
       message: "Airline review created successfully",
@@ -121,7 +98,6 @@ const getAirlineReviews = async (req, res) => {
   }
 };
 module.exports = {
-  initWebSocket,
   createAirlineReview,
   getAirlineReviews,
 };

@@ -42,6 +42,11 @@ const airlineAirportSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+
+  is_increasing: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const AirlineAirport = mongoose.model("AirlineAirport", airlineAirportSchema);
