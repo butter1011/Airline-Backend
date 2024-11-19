@@ -24,12 +24,6 @@ const airportReviewSchema = new mongoose.Schema({
     required: true,
   },
 
-  airport: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "AirlineAirport",
-    required: true,
-  },
-
   accessibility: {
     type: Object,
     required: true,
