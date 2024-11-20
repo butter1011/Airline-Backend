@@ -17,10 +17,15 @@ const userInfoSchema = new mongoose.Schema(
       required: false,
       default: "Business Class",
     },
-    topReviewer: {
+    selectedbadges: {
       type: String,
       required: false,
       default: "TopReviewer",
+    },
+    badgeNumber: {
+      type: Number,
+      required: false,
+      default: 6,
     },
     whatsappNumber: {
       type: String,
@@ -31,11 +36,7 @@ const userInfoSchema = new mongoose.Schema(
       required: false,
       default: +500,
     },
-    badges: {
-      type: Number,
-      required: false,
-      default: +9,
-    },
+
     travelHistory: {
       type: Object,
       required: false,
@@ -66,6 +67,54 @@ const userInfoSchema = new mongoose.Schema(
       enum: ["English", "Chinese", "Russian"],
       required: false,
       default: "English",
+    },
+
+    badgeLists: {
+      topReviewer: {
+        type: Boolean,
+        required: false,
+        default: true,
+      },
+      AccessibleAdvocate: {
+        type: Boolean,
+        required: false,
+        default: true,
+      },
+      atientVoyager: {
+        type: Boolean,
+        required: false,
+        default: true,
+      },
+      NavigationalGuru: {
+        type: Boolean,
+        required: false,
+        default: true,
+      },
+      ComfortConnoisseur: {
+        type: Boolean,
+        required: false,
+        default: true,
+      },
+      CulinaryEnthusiast: {
+        type: Boolean,
+        required: false,
+        default: true,
+      },
+      FacilityVirtuoso: {
+        type: Boolean,
+        required: false,
+        default: true,
+      },
+      ServiceMaven: {
+        type: Boolean,
+        required: false,
+        default: true,
+      },
+      SpotlessTraveler: {
+        type: Boolean,
+        required: false,
+        default: true,
+      },
     },
   },
   {
