@@ -7,7 +7,7 @@ const app = express();
 const { initWebSocket, setWebSocketInstance } = require("./utils/websocket.js");
 const connectDB = require("./utils/connectDB.js");
 const WebSocketServer = require("ws");
-const wss = new WebSocketServer.Server({ port: 8080 });
+const wss = new WebSocketServer.Server({ port: PORT });
 
 const getApi = require("./routes/getRoutes.js");
 const postApi = require("./routes/postRoutes.js");
