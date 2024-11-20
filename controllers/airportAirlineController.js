@@ -22,20 +22,6 @@ const createAirlineAirport = async (req, res) => {
     });
 
     const savedAirlineAirport = await newAirlineAirport.save();
-    const wss = getWebSocketInstance();
-
-    if (wss) {
-      wss.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(
-            JSON.stringify({
-              type: "airlineAirport",
-              data: updatedAirlineAirports,
-            })
-          );
-        }
-      });
-    }
 
     res.status(201).json({
       success: true,

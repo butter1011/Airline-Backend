@@ -43,11 +43,17 @@ const createAirportReview = async (req, res) => {
     await airportScore.save();
 
     // Send WebSocket update
-    const updatedAirlineAirports = await AirlineAirport.find().sort({ overall: -1 });
+    const updatedAirlineAirports = await AirlineAirport.find().sort({
+      overall: -1,
+    });
     const wss = getWebSocketInstance();
+    // console.log("--------------------");
+    // console.log(wss);
+    // console.log("--------------------");
 
     if (wss) {
       wss.clients.forEach((client) => {
+        console.log("+=+=+++++++++++++++");
         client.send(
           JSON.stringify({
             type: "airlineAirport",
