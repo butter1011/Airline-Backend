@@ -90,7 +90,9 @@ const createAirlineReview = async (req, res) => {
     await airlineScore.save();
 
     // Send WebSocket update
-    const updatedAirlineAirports = await AirlineAirport.find();
+    const updatedAirlineAirports = await AirlineAirport.find().sort({
+      overall: -1,
+    });
     const wss = getWebSocketInstance();
 
     if (wss) {
