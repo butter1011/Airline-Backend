@@ -1,6 +1,7 @@
 /// Create the Airline and Airport api
 /// Check if the airline/airport already exists
 const AirlineAirport = require("../models/airlinePortListsSchema");
+const { getWebSocketInstance } = require("../utils/websocket");
 const createAirlineAirport = async (req, res) => {
   try {
     const { name, isAirline } = req.body;
@@ -21,6 +22,20 @@ const createAirlineAirport = async (req, res) => {
     });
 
     const savedAirlineAirport = await newAirlineAirport.save();
+    const wss = getWebSocketInstance();
+
+    if (wss) {
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(
+            JSON.stringify({
+              type: "airlineAirport",
+              data: updatedAirlineAirports,
+            })
+          );
+        }
+      });
+    }
 
     res.status(201).json({
       success: true,
