@@ -1,7 +1,6 @@
 /// Create the Airline and Airport api
 /// Check if the airline/airport already exists
 const AirlineAirport = require("../models/airlinePortListsSchema");
-const { getWebSocketInstance } = require("../utils/websocket");
 const createAirlineAirport = async (req, res) => {
   try {
     const { name, isAirline } = req.body;
@@ -50,6 +49,34 @@ const getAirlineAirport = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+const getAirlineAirportLists = async (req, res) => {
+  try {
+    const airlineList = await AirlineAirport.find({ isAirline: true })
+      .select("name logoImage overall")
+      .sort({ overall: -1 });
+    const airportList = await AirlineAirport.find({ isAirline: false })
+      .select("name logoImage overall")
+      .sort({ overall: -1 });
+
+    res.status(200).json({
+      success: true,
+      message: "Airline and Airport lists retrieved successfully",
+      data: {
+        airlines: airlineList,
+        airports: airportList,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching airline and airport lists:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error retrieving Airline and Airport lists",
+      error: error.message,
+    });
+  }
+};
+
 const updateAirlineAirport = async (req, res) => {
   try {
     const {
@@ -63,6 +90,11 @@ const updateAirlineAirport = async (req, res) => {
       pey,
       overall,
       location,
+      logoImage,
+      backgroundImage,
+      descriptionBio,
+      trendingBio,
+      perksBio,
     } = req.body;
 
     const updatedAirlineAirport = await AirlineAirport.findByIdAndUpdate(
@@ -77,6 +109,11 @@ const updateAirlineAirport = async (req, res) => {
         pey,
         overall,
         location,
+        logoImage,
+        backgroundImage,
+        descriptionBio,
+        trendingBio,
+        perksBio,
       },
       { new: true, runValidators: true }
     );
@@ -101,9 +138,9 @@ const updateAirlineAirport = async (req, res) => {
     });
   }
 };
-
 module.exports = {
   createAirlineAirport,
   getAirlineAirport,
   updateAirlineAirport,
+  getAirlineAirportLists,
 };

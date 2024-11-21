@@ -6,7 +6,7 @@ const { calculateAirlineScores } = require("./calculatorController");
 const { getWebSocketInstance } = require("../utils/websocket");
 const WebSocket = require("ws");
 
-const locationToContinentMap = require("./city.json");
+const locationToContinentMap = require("../json/city.json");
 
 const getContinentForLocation = (location) => {
   if (!location) {
@@ -206,9 +206,7 @@ const gettingReviewData = async (req, res) => {
       }
       reviewsByContinent[continent].data.push(reviewData);
     });
-    console.log("💚😍", reviewsByContinent);
     const formattedReviews = Object.values(reviewsByContinent);
-    console.log("💚😍", formattedReviews);
     res.status(200).json({ formattedReviews: formattedReviews });
   } catch (error) {
     console.error("Error fetching airline reviews:", error);
