@@ -53,7 +53,6 @@ const createAirportReview = async (req, res) => {
 
     if (wss) {
       wss.clients.forEach((client) => {
-        console.log("+=+=+++++++++++++++");
         client.send(
           JSON.stringify({
             type: "airlineAirport",
