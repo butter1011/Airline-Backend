@@ -172,7 +172,7 @@ const gettingReviewData = async (req, res) => {
       })
       .populate({
         path: "airline",
-        select: "name location isAirline overall",
+        select: "name location isAirline overall totalReviews isIncreasing",
         model: AirlineAirport,
       })
       .find({ reviewer: req.body._id });
@@ -187,6 +187,8 @@ const gettingReviewData = async (req, res) => {
       const continent = getContinentForLocation(location);
 
       const reviewData = {
+        totalReviews: review.airline?.totalReviews || 0,
+        isIncreasing: review.airline?.isIncreasing || false,
         id: review._id,
         location: location,
         continent: continent,
