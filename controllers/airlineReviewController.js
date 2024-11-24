@@ -8,6 +8,8 @@ const WebSocket = require("ws");
 
 const locationToContinentMap = require("../json/city.json");
 
+///
+/// Get the Continent for the given location
 const getContinentForLocation = (location) => {
   if (!location) {
     console.log("Location is undefined or null");
@@ -52,6 +54,8 @@ const getContinentForLocation = (location) => {
   return "Unknown";
 };
 
+///
+/// Create a new airline review
 const createAirlineReview = async (req, res) => {
   try {
     const {
@@ -118,6 +122,8 @@ const createAirlineReview = async (req, res) => {
   }
 };
 
+///
+/// Get all airline reviews
 const getAirlineReviews = async (req, res) => {
   try {
     const reviews = await AirlineReview.find()
@@ -161,9 +167,10 @@ const getAirlineReviews = async (req, res) => {
   }
 };
 
+///
+/// Get a single airline review by ContinentID
 const gettingReviewData = async (req, res) => {
   try {
-    console.log(req.body);
     const reviews = await AirlineReview.find()
       .populate({
         path: "reviewer",
@@ -177,7 +184,6 @@ const gettingReviewData = async (req, res) => {
       })
       .find({ reviewer: req.body._id });
     //   res.status(200).json(reviews);
-    console.log(reviews);
 
     const reviewsByContinent = {};
 
@@ -216,9 +222,14 @@ const gettingReviewData = async (req, res) => {
   }
 };
 
+///
+/// Get a single airline review by AirlineID
+
 const getAirlineReviewsByAirlineId = async (req, res) => {
   try {
     const { airlineId } = req.params;
+
+    console.log("airlineId:", airlineId);
 
     const reviews = await AirlineReview.find({ airline: airlineId })
       .populate({
@@ -273,8 +284,74 @@ const getAirlineReviewsByAirlineId = async (req, res) => {
   }
 };
 
+///
+//// Get a single airline review by UserID
+
+const getReviewsByUserId = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const reviews = await AirlineReview.find({ reviewer: id })
+      .populate({
+        path: "reviewer",
+        select: "name profilePhoto",
+        model: UserInfo,
+      })
+      .populate({
+        path: "from",
+        select: "name location",
+        model: AirlineAirport,
+      })
+      .populate({
+        path: "to",
+        select: "name location",
+        model: AirlineAirport,
+      })
+      .populate({
+        path: "airline",
+        select: "name",
+        model: AirlineAirport,
+      })
+      .sort({ date: -1 });
+
+    const formattedReviews = reviews.map((review) => ({
+      id: review._id,
+      reviewer: {
+        name: review.reviewer.name,
+        profilePhoto: review.reviewer.profilePhoto,
+      },
+      from: {
+        name: review.from.name,
+        location: review.from.location,
+      },
+      to: {
+        name: review.to.name,
+        location: review.to.location,
+      },
+      airline: {
+        name: review.airline.name,
+      },
+      classTravel: review.classTravel,
+      date: review.date,
+      comment: review.comment,
+    }));
+
+    if (!reviews.length) {
+      return res
+        .status(404)
+        .json({ message: "No reviews found for this user" });
+    }
+
+    res.status(200).json(formattedReviews);
+  } catch (error) {
+    console.error("Error fetching reviews by user ID:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   getAirlineReviewsByAirlineId,
+  getReviewsByUserId,
   createAirlineReview,
   getAirlineReviews,
   gettingReviewData,

@@ -1,6 +1,10 @@
 /// Create the Airline and Airport api
 /// Check if the airline/airport already exists
 const AirlineAirport = require("../models/airlinePortListsSchema");
+const AirportReview = require("../models/airportReviewsSchema");
+
+///
+/// Create the Airline and Airport api
 const createAirlineAirport = async (req, res) => {
   try {
     const { name, isAirline } = req.body;
@@ -36,6 +40,8 @@ const createAirlineAirport = async (req, res) => {
   }
 };
 
+///
+/// Get the Airline and Airport api
 const getAirlineAirport = async (req, res) => {
   try {
     const airlineAirports = await AirlineAirport.find().sort({ overall: -1 });
@@ -76,6 +82,9 @@ const getAirlineAirportLists = async (req, res) => {
     });
   }
 };
+
+///
+/// Update the Airline and Airport api
 
 const updateAirlineAirport = async (req, res) => {
   try {
@@ -140,7 +149,67 @@ const updateAirlineAirport = async (req, res) => {
     });
   }
 };
+
+///
+/// Get the airport review by user id
+const getAirportReviewByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const reviews = await AirportReview.find({ reviewer: userId })
+      .populate({
+        path: "reviewer",
+        select: "name profilePhoto",
+        model: "UserInfo",
+      })
+      .populate({
+        path: "airport",
+        select: "name",
+        model: "AirlineAirport",
+      })
+      .populate({
+        path: "airline",
+        select: "name",
+        model: "AirlineAirport",
+      })
+      .sort({ date: -1 });
+
+    if (!reviews || reviews.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No reviews found for this user" });
+    }
+
+    const formattedReviews = reviews.map((review) => ({
+      id: review._id,
+      reviewer: {
+        name: review.reviewer.name,
+        profilePhoto: review.reviewer.profilePhoto,
+      },
+      airport: {
+        name: review.airport.name,
+      },
+      airline: review.airline
+        ? {
+            name: review.airline.name,
+          }
+        : null,
+      comment: review.comment,
+      date: review.date,
+    }));
+
+    res.status(200).json({
+      message: "User reviews retrieved successfully",
+      reviews: formattedReviews,
+    });
+  } catch (error) {
+    console.error("Error retrieving user reviews:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
+  getAirportReviewByUserId,
   createAirlineAirport,
   getAirlineAirport,
   updateAirlineAirport,

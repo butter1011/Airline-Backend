@@ -3,11 +3,13 @@ const router = express.Router();
 const {
   getAirlineAirport,
   getAirlineAirportLists,
+  getAirportReviewByUserId,
 } = require("../controllers/airportAirlineController");
 const { getUserInfo } = require("../controllers/userInfoController");
 const {
   getAirlineReviews,
   getAirlineReviewsByAirlineId,
+  getReviewsByUserId,
 } = require("../controllers/airlineReviewController");
 
 const {
@@ -20,7 +22,11 @@ router.get("/api/v2/airline-reviews", getAirlineReviews);
 router.get("/api/v2/userinfo/:id", getUserInfo);
 router.get("/api/v2/airline-airport/lists", getAirlineAirportLists);
 
-router.get("/api/v2/airline-reviews/:id", getAirlineReviewsByAirlineId);
-router.get("/api/v2/airport-reviews/:id", getAirportReviewByAirportId);
+
+router.get("/api/v2/airline-reviews/user/:userId", getReviewsByUserId);
+router.get("/api/v2/airport-reviews/user/:userId", getAirportReviewByUserId);
+
+router.get("/api/v2/airline-reviews/:airlineId", getAirlineReviewsByAirlineId);
+router.get("/api/v2/airport-reviews/:airportId", getAirportReviewByAirportId);
 
 module.exports = router;
