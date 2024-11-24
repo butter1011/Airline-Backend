@@ -47,9 +47,6 @@ const createAirportReview = async (req, res) => {
       overall: -1,
     });
     const wss = getWebSocketInstance();
-    // console.log("--------------------");
-    // console.log(wss);
-    // console.log("--------------------");
 
     if (wss) {
       wss.clients.forEach((client) => {
@@ -72,4 +69,59 @@ const createAirportReview = async (req, res) => {
   }
 };
 
-module.exports = { createAirportReview };
+const getAirportReviewByAirportId = async (req, res) => {
+  try {
+    const { airportId } = req.params;
+
+    const reviews = await AirportReview.findById(airportId)
+      .populate({
+        path: "reviewer",
+        select: "name profilePhoto",
+        model: UserInfo,
+      })
+      .populate({
+        path: "airport",
+        select: "name",
+        model: AirlineAirport,
+      })
+      .populate({
+        path: "airline",
+        select: "name",
+        model: AirlineAirport,
+      })
+      .sort({ date: -1 });
+
+    const formattedReviews = reviews.map((review) => ({
+      id: review._id,
+      reviewer: {
+        name: review.reviewer.name,
+        profilePhoto: review.reviewer.profilePhoto,
+      },
+      from: {
+        name: review.from.name,
+      },
+      to: {
+        name: review.to.name,
+      },
+      airline: {
+        name: review.airline.name,
+      },
+      classTravel: review.classTravel,
+      comment: review.comment,
+    }));
+
+    if (!reviews) {
+      return res.status(404).json({ message: "Airport review not found" });
+    }
+
+    res.status(200).json({
+      message: "Airport review retrieved successfully",
+      formattedReviews,
+    });
+  } catch (error) {
+    console.error("Error retrieving airport review:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+module.exports = { createAirportReview, getAirportReviewByAirportId };

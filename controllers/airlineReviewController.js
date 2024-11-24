@@ -216,7 +216,65 @@ const gettingReviewData = async (req, res) => {
   }
 };
 
+const getAirlineReviewsByAirlineId = async (req, res) => {
+  try {
+    const { airlineId } = req.params;
+
+    const reviews = await AirlineReview.find({ airline: airlineId })
+      .populate({
+        path: "reviewer",
+        select: "name profilePhoto",
+        model: UserInfo,
+      })
+      .populate({
+        path: "from",
+        select: "name",
+        model: AirlineAirport,
+      })
+      .populate({
+        path: "to",
+        select: "name",
+        model: AirlineAirport,
+      })
+      .populate({
+        path: "airline",
+        select: "name",
+        model: AirlineAirport,
+      })
+      .sort({ date: -1 });
+
+    const formattedReviews = reviews.map((review) => ({
+      id: review._id,
+      reviewer: {
+        name: review.reviewer.name,
+        profilePhoto: review.reviewer.profilePhoto,
+      },
+      from: {
+        name: review.from.name,
+      },
+      to: {
+        name: review.to.name,
+      },
+      airline: {
+        name: review.airline.name,
+      },
+      classTravel: review.classTravel,
+      comment: review.comment,
+    }));
+
+    if (!reviews) {
+      return res.status(404).json({ message: "Airline review not found" });
+    }
+
+    res.status(200).json(formattedReviews);
+  } catch (error) {
+    console.error("Error fetching airline reviews by airline ID:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
+  getAirlineReviewsByAirlineId,
   createAirlineReview,
   getAirlineReviews,
   gettingReviewData,
