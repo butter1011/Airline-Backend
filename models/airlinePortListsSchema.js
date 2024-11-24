@@ -72,6 +72,11 @@ const airlineAirportSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+
+  iataCode: {
+    type: String,
+    required: false,
+  },
 });
 
 const AirlineAirport = mongoose.model("AirlineAirport", airlineAirportSchema);

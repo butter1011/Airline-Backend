@@ -95,6 +95,7 @@ const updateAirlineAirport = async (req, res) => {
       descriptionBio,
       trendingBio,
       perksBio,
+      iataCode,
     } = req.body;
 
     const updatedAirlineAirport = await AirlineAirport.findByIdAndUpdate(
@@ -114,6 +115,7 @@ const updateAirlineAirport = async (req, res) => {
         descriptionBio,
         trendingBio,
         perksBio,
+        iataCode,
       },
       { new: true, runValidators: true }
     );
