@@ -89,7 +89,7 @@ const getAirportReviewByAirportId = async (req, res) => {
         select: "name",
         model: AirlineAirport,
       })
-      .sort({ date: -1 });
+      .sort({ rating: -1 });
 
     const formattedReviews = reviews.map((review) => ({
       id: review._id,
@@ -108,6 +108,7 @@ const getAirportReviewByAirportId = async (req, res) => {
       },
       classTravel: review.classTravel,
       comment: review.comment,
+      rating: review.rating,
     }));
 
     if (!reviews) {

@@ -137,6 +137,16 @@ const getAirlineReviews = async (req, res) => {
         select: "name location",
         model: AirlineAirport,
       })
+      .populate({
+        path: "from",
+        select: "name",
+        model: AirlineAirport,
+      })
+      .populate({
+        path: "to",
+        select: "name",
+        model: AirlineAirport,
+      })
       .sort({ rating: -1 });
 
     const formattedReviews = reviews.map((review) => ({
@@ -147,11 +157,9 @@ const getAirlineReviews = async (req, res) => {
       },
       from: {
         name: review.from.name,
-        country: review.from.location,
       },
       to: {
         name: review.to.name,
-        country: review.to.location,
       },
       airline: {
         name: review.airline.name,
