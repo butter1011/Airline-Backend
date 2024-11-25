@@ -63,6 +63,7 @@ const airlineReviewSchema = new mongoose.Schema({
 
   comment: {
     type: String,
+    trim: true,
   },
 
   date: {

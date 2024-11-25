@@ -50,6 +50,7 @@ const airportReviewSchema = new mongoose.Schema({
 
   comment: {
     type: String,
+    trim: true,
   },
 
   date: {

@@ -77,6 +77,11 @@ const airlineAirportSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+
+  countryCode: {
+    type: String,
+    required: false,
+  },
 });
 
 const AirlineAirport = mongoose.model("AirlineAirport", airlineAirportSchema);

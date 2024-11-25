@@ -19,6 +19,7 @@ const {
 // Get api
 router.get("/api/v2/airline-airport", getAirlineAirport);
 router.get("/api/v2/airline-reviews", getAirlineReviews);
+router.get("/api/v2/airport-reviews", getAirlineReviews);
 router.get("/api/v2/userinfo/:id", getUserInfo);
 router.get("/api/v2/airline-airport/lists", getAirlineAirportLists);
 
