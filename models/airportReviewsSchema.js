@@ -57,9 +57,9 @@ const airportReviewSchema = new mongoose.Schema({
     default: Date.now,
   },
 
-  rating: { 
+  rating: {
     type: Number,
-    required: true,
+    default: 0,
   },
 });
 
