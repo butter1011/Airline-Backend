@@ -56,6 +56,11 @@ const airportReviewSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+
+  rating: { 
+    type: Number,
+    required: true,
+  },
 });
 
 const AirportReview = mongoose.model("AirportReview", airportReviewSchema);
