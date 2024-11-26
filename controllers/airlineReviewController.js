@@ -129,22 +129,22 @@ const getAirlineReviews = async (req, res) => {
     const reviews = await AirlineReview.find()
       .populate({
         path: "reviewer",
-        select: "name profilePhoto",
+        select: "name profilePhoto _id",
         model: UserInfo,
       })
       .populate({
         path: "airline",
-        select: "name location",
+        select: "name _id",
         model: AirlineAirport,
       })
       .populate({
         path: "from",
-        select: "name",
+        select: "name _id",
         model: AirlineAirport,
       })
       .populate({
         path: "to",
-        select: "name",
+        select: "name _id",
         model: AirlineAirport,
       })
       .sort({ rating: -1 });
@@ -154,15 +154,19 @@ const getAirlineReviews = async (req, res) => {
       reviewer: {
         name: review.reviewer.name,
         profilePhoto: review.reviewer.profilePhoto,
+        _id: review.reviewer._id,
       },
       from: {
         name: review.from.name,
+        _id: review.from._id,
       },
       to: {
         name: review.to.name,
+        _id: review.to._id,
       },
       airline: {
         name: review.airline.name,
+        _id: review.airline._id,
       },
       classTravel: review.classTravel,
       comment: review.comment,
