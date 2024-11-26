@@ -41,21 +41,8 @@ const createUserInfo = async (req, res) => {
   }
 };
 
-// Middleware function to get a single user info
-const getUserInfo = async (req, res) => {
-  let userInfo;
-  try {
-    userInfo = await UserInfo.findById(req.params.id);
-    if (userInfo == null) {
-      return res.status(404).json({ message: "User not found" });
-    }
-  } catch (err) {
-    return res.status(500).json({ message: err.message });
-  }
-
-  res.json(userInfo);
-};
-
+///
+/// Edit user
 const editUserInfo = async (req, res) => {
   let { name, bio, _id } = req.body;
   let editingUser = null;
@@ -75,10 +62,11 @@ const editUserInfo = async (req, res) => {
   }
 };
 
+///
+/// BadgeEdit user
 const badgeEditUserInfo = async (req, res) => {
   let { selectedbadges, _id } = req.body;
   let badgeEditingUser = null;
-  console.log("🌹🌹🌹", selectedbadges);
   try {
     // Check if user already exists
     badgeEditingUser = await UserInfo.findOne({ _id: _id });
@@ -86,7 +74,6 @@ const badgeEditUserInfo = async (req, res) => {
     badgeEditingUser.selectedbadges = selectedbadges;
 
     await badgeEditingUser.save();
-    console.log("🏀🏀🏀", badgeEditingUser);
     res.json({ userData: badgeEditingUser, userState: 1 });
   } catch (error) {
     console.error("Error editingUser:", error);
@@ -96,7 +83,6 @@ const badgeEditUserInfo = async (req, res) => {
 
 module.exports = {
   createUserInfo,
-  getUserInfo,
   editUserInfo,
   badgeEditUserInfo,
 };

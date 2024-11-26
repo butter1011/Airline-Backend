@@ -1,57 +1,15 @@
 const AirlineAirport = require("../models/airlinePortListsSchema");
 const AirlineReview = require("../models/airlineReviewsSchema");
 const UserInfo = require("../models/userInfoSchema");
-const { countries, continents } = require("countries-list");
 const { calculateAirlineScores } = require("./calculatorController");
 const { getWebSocketInstance } = require("../utils/websocket");
 const WebSocket = require("ws");
 
-const locationToContinentMap = require("./city.json");
+// const { countries, continents } = require("countries-list");
+// const locationToContinentMap = require("../json/city.json");
 
-const getContinentForLocation = (location) => {
-  if (!location) {
-    console.log("Location is undefined or null");
-    return "Unknown";
-  }
-
-  const normalizedLocation = location.trim().toLowerCase();
-  console.log(`Normalized location: ${normalizedLocation}`);
-
-  // Check our custom map first
-  if (locationToContinentMap[normalizedLocation]) {
-    console.log(
-      `Custom map match found: ${normalizedLocation} (${locationToContinentMap[normalizedLocation]})`
-    );
-    return locationToContinentMap[normalizedLocation];
-  }
-
-  // Check countries from countries-list
-  for (const [code, country] of Object.entries(countries)) {
-    if (country.name.toLowerCase() === normalizedLocation) {
-      const continent = continents[country.continent];
-      console.log(`Country match found: ${country.name} (${continent})`);
-      return continent;
-    }
-  }
-
-  // If no exact match, try partial matching
-  for (const [code, country] of Object.entries(countries)) {
-    if (
-      country.name.toLowerCase().includes(normalizedLocation) ||
-      normalizedLocation.includes(country.name.toLowerCase())
-    ) {
-      const continent = continents[country.continent];
-      console.log(
-        `Partial country match found: ${country.name} (${continent})`
-      );
-      return continent;
-    }
-  }
-
-  console.log(`No match found for: ${normalizedLocation}`);
-  return "Unknown";
-};
-
+///
+/// Create a new airline review
 const createAirlineReview = async (req, res) => {
   try {
     const {
@@ -90,7 +48,9 @@ const createAirlineReview = async (req, res) => {
     await airlineScore.save();
 
     // Send WebSocket update
-    const updatedAirlineAirports = await AirlineAirport.find();
+    const updatedAirlineAirports = await AirlineAirport.find().sort({
+      overall: -1,
+    });
     const wss = getWebSocketInstance();
 
     if (wss) {
@@ -116,40 +76,86 @@ const createAirlineReview = async (req, res) => {
   }
 };
 
+///
+/// Update an existing airline review
+const updateAirlineReview = async (req, res) => {
+  try {
+    const { feedbackId, reactionType, thumbUpCount } = req.body;
+
+    const updatedReview = await AirlineReview.findByIdAndUpdate(
+      feedbackId,
+      {
+        $set: {
+          rating: thumbUpCount,
+        },
+      },
+      { new: true }
+    );
+
+    if (!updatedReview) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    res.status(200).json({
+      message: "Review updated successfully",
+      review: updatedReview,
+    });
+  } catch (error) {
+    console.error("Error updating airline review:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+///
+/// Get all airline reviews
 const getAirlineReviews = async (req, res) => {
   try {
     const reviews = await AirlineReview.find()
       .populate({
         path: "reviewer",
-        select: "name profilePhoto",
+        select: "name profilePhoto _id",
         model: UserInfo,
       })
       .populate({
         path: "airline",
-        select: "name location",
+        select: "name _id",
         model: AirlineAirport,
-      });
+      })
+      .populate({
+        path: "from",
+        select: "name _id",
+        model: AirlineAirport,
+      })
+      .populate({
+        path: "to",
+        select: "name _id",
+        model: AirlineAirport,
+      })
+      .sort({ rating: -1 });
 
     const formattedReviews = reviews.map((review) => ({
       id: review._id,
       reviewer: {
         name: review.reviewer.name,
         profilePhoto: review.reviewer.profilePhoto,
+        _id: review.reviewer._id,
       },
       from: {
         name: review.from.name,
-        country: review.from.location,
+        _id: review.from._id,
       },
       to: {
         name: review.to.name,
-        country: review.to.location,
+        _id: review.to._id,
       },
       airline: {
         name: review.airline.name,
+        _id: review.airline._id,
       },
       classTravel: review.classTravel,
       comment: review.comment,
       date: review.date,
+      rating: review.rating,
     }));
 
     res.status(200).json(formattedReviews);
@@ -159,63 +165,108 @@ const getAirlineReviews = async (req, res) => {
   }
 };
 
-const gettingReviewData = async (req, res) => {
-  try {
-    console.log(req.body);
-    const reviews = await AirlineReview.find()
-      .populate({
-        path: "reviewer",
-        select: "_id",
-        model: UserInfo,
-      })
-      .populate({
-        path: "airline",
-        select: "name location isAirline overall",
-        model: AirlineAirport,
-      })
-      .find({ reviewer: req.body._id });
-    //   res.status(200).json(reviews);
-    console.log(reviews);
+// ///
+// /// Get the Continent for the given location
+// const getContinentForLocation = (location) => {
+//   if (!location) {
+//     console.log("Location is undefined or null");
+//     return "Unknown";
+//   }
 
-    const reviewsByContinent = {};
+//   const normalizedLocation = location.trim().toLowerCase();
+//   console.log(`Normalized location: ${normalizedLocation}`);
 
-    reviews.forEach((review) => {
-      const location = review.airline?.location || "Unknown";
-      console.log(`Processing location: ${location}`);
-      const continent = getContinentForLocation(location);
+//   // Check our custom map first
+//   if (locationToContinentMap[normalizedLocation]) {
+//     console.log(
+//       `Custom map match found: ${normalizedLocation} (${locationToContinentMap[normalizedLocation]})`
+//     );
+//     return locationToContinentMap[normalizedLocation];
+//   }
 
-      const reviewData = {
-        id: review._id,
-        location: location,
-        continent: continent,
-        airline: review.airline?.name || "Unknown",
-        isAirline: review.airline?.isAirline || false,
-        overall: review.airline?.overall || 0,
-        classTravel: review.classTravel,
-        userId: review.reviewer?._id,
-        date: review.date,
-      };
+//   // Check countries from countries-list
+//   for (const [code, country] of Object.entries(countries)) {
+//     if (country.name.toLowerCase() === normalizedLocation) {
+//       const continent = continents[country.continent];
+//       console.log(`Country match found: ${country.name} (${continent})`);
+//       return continent;
+//     }
+//   }
 
-      if (!reviewsByContinent[continent]) {
-        reviewsByContinent[continent] = {
-          continent: continent,
-          data: [],
-        };
-      }
-      reviewsByContinent[continent].data.push(reviewData);
-    });
-    console.log("💚😍", reviewsByContinent);
-    const formattedReviews = Object.values(reviewsByContinent);
-    console.log("💚😍", formattedReviews);
-    res.status(200).json({ formattedReviews: formattedReviews });
-  } catch (error) {
-    console.error("Error fetching airline reviews:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
+//   // If no exact match, try partial matching
+//   for (const [code, country] of Object.entries(countries)) {
+//     if (
+//       country.name.toLowerCase().includes(normalizedLocation) ||
+//       normalizedLocation.includes(country.name.toLowerCase())
+//     ) {
+//       const continent = continents[country.continent];
+//       console.log(
+//         `Partial country match found: ${country.name} (${continent})`
+//       );
+//       return continent;
+//     }
+//   }
+
+//   console.log(`No match found for: ${normalizedLocation}`);
+//   return "Unknown";
+// };
+
+// ///
+// /// Get a single airline review by ContinentID
+// const gettingReviewData = async (req, res) => {
+//   try {
+//     const reviews = await AirlineReview.find()
+//       .populate({
+//         path: "reviewer",
+//         select: "_id",
+//         model: UserInfo,
+//       })
+//       .populate({
+//         path: "airline",
+//         select: "name location isAirline overall totalReviews isIncreasing",
+//         model: AirlineAirport,
+//       })
+//       .find({ reviewer: req.body._id });
+//     //   res.status(200).json(reviews);
+
+//     const reviewsByContinent = {};
+
+//     reviews.forEach((review) => {
+//       const location = review.airline?.location || "Unknown";
+//       console.log(`Processing location: ${location}`);
+//       const continent = getContinentForLocation(location);
+
+//       const reviewData = {
+//         totalReviews: review.airline?.totalReviews || 0,
+//         isIncreasing: review.airline?.isIncreasing || false,
+//         id: review._id,
+//         location: location,
+//         continent: continent,
+//         airline: review.airline?.name || "Unknown",
+//         isAirline: review.airline?.isAirline || false,
+//         overall: review.airline?.overall || 0,
+//         classTravel: review.classTravel,
+//         userId: review.reviewer?._id,
+//         date: review.date,
+//       };
+
+//       if (!reviewsByContinent[continent]) {
+//         reviewsByContinent[continent] = {
+//           continent: continent,
+//           data: [],
+//         };
+//       }
+//       reviewsByContinent[continent].data.push(reviewData);
+//     });
+//     const formattedReviews = Object.values(reviewsByContinent);
+//     res.status(200).json({ formattedReviews: formattedReviews });
+//   } catch (error) {
+//     console.error("Error fetching airline reviews:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
 
 module.exports = {
   createAirlineReview,
   getAirlineReviews,
-  gettingReviewData,
 };

@@ -1,6 +1,10 @@
 /// Create the Airline and Airport api
 /// Check if the airline/airport already exists
 const AirlineAirport = require("../models/airlinePortListsSchema");
+const AirportReview = require("../models/airportReviewsSchema");
+
+///
+/// Create the Airline and Airport api
 const createAirlineAirport = async (req, res) => {
   try {
     const { name, isAirline } = req.body;
@@ -36,6 +40,8 @@ const createAirlineAirport = async (req, res) => {
   }
 };
 
+///
+/// Get the Airline and Airport api
 const getAirlineAirport = async (req, res) => {
   try {
     const airlineAirports = await AirlineAirport.find().sort({ overall: -1 });
@@ -49,6 +55,9 @@ const getAirlineAirport = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+///
+/// Update the Airline and Airport api
 const updateAirlineAirport = async (req, res) => {
   try {
     const {
@@ -62,6 +71,13 @@ const updateAirlineAirport = async (req, res) => {
       pey,
       overall,
       location,
+      logoImage,
+      backgroundImage,
+      descriptionBio,
+      trendingBio,
+      perksBio,
+      iataCode,
+      countryCode,
     } = req.body;
 
     const updatedAirlineAirport = await AirlineAirport.findByIdAndUpdate(
@@ -76,6 +92,13 @@ const updateAirlineAirport = async (req, res) => {
         pey,
         overall,
         location,
+        logoImage,
+        backgroundImage,
+        descriptionBio,
+        trendingBio,
+        perksBio,
+        iataCode,
+        countryCode,
       },
       { new: true, runValidators: true }
     );

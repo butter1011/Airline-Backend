@@ -47,6 +47,41 @@ const airlineAirportSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+
+  logoImage: {
+    type: String,
+    required: false,
+  },
+
+  backgroundImage: {
+    type: String,
+    required: false,
+  },
+
+  descriptionBio: {
+    type: String,
+    required: false,
+  },
+
+  trendingBio: {
+    type: String,
+    required: false,
+  },
+
+  perksBio: {
+    type: String,
+    required: false,
+  },
+
+  iataCode: {
+    type: String,
+    required: false,
+  },
+
+  countryCode: {
+    type: String,
+    required: false,
+  },
 });
 
 const AirlineAirport = mongoose.model("AirlineAirport", airlineAirportSchema);
