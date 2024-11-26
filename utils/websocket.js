@@ -18,7 +18,7 @@ const initWebSocket = (server) => {
     ws.on("close", () => {
       // console.log("Client disconnected");
     });
-  }); 
+  });
 };
 
 module.exports = {

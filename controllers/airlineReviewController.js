@@ -77,6 +77,36 @@ const createAirlineReview = async (req, res) => {
 };
 
 ///
+/// Update an existing airline review
+const updateAirlineReview = async (req, res) => {
+  try {
+    const { feedbackId, reactionType, thumbUpCount } = req.body;
+
+    const updatedReview = await AirlineReview.findByIdAndUpdate(
+      feedbackId,
+      {
+        $set: {
+          rating: thumbUpCount,
+        },
+      },
+      { new: true }
+    );
+
+    if (!updatedReview) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    res.status(200).json({
+      message: "Review updated successfully",
+      review: updatedReview,
+    });
+  } catch (error) {
+    console.error("Error updating airline review:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+///
 /// Get all airline reviews
 const getAirlineReviews = async (req, res) => {
   try {

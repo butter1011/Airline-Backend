@@ -83,7 +83,6 @@ const badgeEditUserInfo = async (req, res) => {
 
 module.exports = {
   createUserInfo,
-  getUserInfo,
   editUserInfo,
   badgeEditUserInfo,
 };
