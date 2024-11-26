@@ -80,21 +80,30 @@ const createAirlineReview = async (req, res) => {
 /// Update an existing airline review
 const updateAirlineReview = async (req, res) => {
   try {
-    const { feedbackId, reactionType, thumbUpCount } = req.body;
+    const { feedbackId, user_id, reactionType } = req.body;
+
+    const existingReview = await AirlineReview.findById(feedbackId);
+    if (!existingReview) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    let updatedRating = { ...existingReview.rating };
+
+    if (!updatedRating.hasOwnProperty(user_id)) {
+      updatedRating[user_id] = reactionType;
+    } else {
+      updatedRating[user_id] = reactionType;
+    }
 
     const updatedReview = await AirlineReview.findByIdAndUpdate(
       feedbackId,
       {
         $set: {
-          rating: thumbUpCount,
+          rating: updatedRating,
         },
       },
       { new: true }
     );
-
-    if (!updatedReview) {
-      return res.status(404).json({ message: "Review not found" });
-    }
 
     res.status(200).json({
       message: "Review updated successfully",
@@ -105,7 +114,6 @@ const updateAirlineReview = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
 ///
 /// Get all airline reviews
 const getAirlineReviews = async (req, res) => {
@@ -269,4 +277,5 @@ const getAirlineReviews = async (req, res) => {
 module.exports = {
   createAirlineReview,
   getAirlineReviews,
+  updateAirlineReview,
 };

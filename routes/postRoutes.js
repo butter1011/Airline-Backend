@@ -14,6 +14,7 @@ const {
 } = require("../controllers/airportReviewController");
 const {
   createAirlineReview,
+  updateAirlineReview,
 } = require("../controllers/airlineReviewController");
 
 /// Post api
@@ -22,6 +23,7 @@ router.post("/api/v1/editUser", editUserInfo);
 router.post("/api/v1/badgeEditUser", badgeEditUserInfo);
 router.post("/api/v1/airport-review", createAirportReview);
 router.post("/api/v1/airline-review", createAirlineReview);
+router.post("/api/v1/airline-review/update", updateAirlineReview);
 
 // Postman API
 router.post("/api/v1/airline-airport/create", createAirlineAirport);

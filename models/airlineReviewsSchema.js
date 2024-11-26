@@ -72,8 +72,7 @@ const airlineReviewSchema = new mongoose.Schema({
   },
 
   rating: {
-    type: Number,
-    default: 0,
+    type: Object,
   },
 });
 

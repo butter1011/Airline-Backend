@@ -1,7 +1,6 @@
 /// Create the Airline and Airport api
 /// Check if the airline/airport already exists
 const AirlineAirport = require("../models/airlinePortListsSchema");
-const AirportReview = require("../models/airportReviewsSchema");
 
 ///
 /// Create the Airline and Airport api
