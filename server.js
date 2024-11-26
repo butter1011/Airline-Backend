@@ -1,18 +1,16 @@
+const PORT = process.env.PORT || 3000;
 const express = require("express");
-const bodyParser = require("body-parser");
 const cors = require("cors");
-
+const bodyParser = require("body-parser");
 const app = express();
-const WebSocketServer = require("ws");
-const wss = new WebSocketServer({ port: 8080 });
 
-const { initWebSocket } = require("./utils/websocket.js");
+const { initWebSocket, setWebSocketInstance } = require("./utils/websocket.js");
 const connectDB = require("./utils/connectDB.js");
+const WebSocketServer = require("ws");
+const wss = new WebSocketServer.Server({ port: 8080 });
 
 const getApi = require("./routes/getRoutes.js");
 const postApi = require("./routes/postRoutes.js");
-
-const PORT = process.env.PORT || 3000;
 
 // Connect to MongoDB
 connectDB();
@@ -26,9 +24,8 @@ app.use(express.json());
 app.use(postApi);
 app.use(getApi);
 
-// Initialize WebSocket
-initWebSocket(wss);
-
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-E8LAFie1sGKdHMG5;
+const server = app.listen(PORT, () =>
+  console.log(`Server running on port ${PORT}`)
+);
+initWebSocket(server);
+setWebSocketInstance(wss);
