@@ -2,6 +2,8 @@ const AirlineScore = require("../models/airlineScoresSchema");
 const AirportScore = require("../models/airportScoresSchema");
 const AirlineAirport = require("../models/airlinePortListsSchema");
 
+///
+/// Calculate the scores for an airline review
 const calculateAirlineScores = async (airlineReview) => {
   const categories = [
     "departureArrival",
@@ -113,14 +115,15 @@ const calculateAirlineScores = async (airlineReview) => {
     airlineAirport.overall = updateOverallScore(airlineAirport);
 
     // Update isIncreasing flag based on overall score change
-    airlineAirport.isIncreasing =
-      airlineAirport.overall > previousOverallScore;
+    airlineAirport.isIncreasing = airlineAirport.overall > previousOverallScore;
     await airlineAirport.save();
   }
 
   return airlineScore;
 };
 
+///
+/// Calculate the scores for an airport review
 const calculateAirportScores = async (airportReview) => {
   const categories = [
     "accessibility",
@@ -221,6 +224,8 @@ const calculateAirportScores = async (airportReview) => {
   return airportScore;
 };
 
+///
+/// Update the class-specific scores
 const updateClassScore = (currentScore, newScore, totalReviews) => {
   if (currentScore !== undefined && currentScore !== null) {
     return (currentScore * (totalReviews - 1) + newScore) / totalReviews;
@@ -228,9 +233,13 @@ const updateClassScore = (currentScore, newScore, totalReviews) => {
   return newScore;
 };
 
+///
+/// Update the overall score
 const updateOverallScore = (airlineAirport, newScore) => {
   if (airlineAirport.overall !== undefined && airlineAirport.overall !== null) {
-    const updatedScore = (airlineAirport.overall * (airlineAirport.totalReviews - 1) + newScore) / airlineAirport.totalReviews;
+    const updatedScore =
+      (airlineAirport.overall * (airlineAirport.totalReviews - 1) + newScore) /
+      airlineAirport.totalReviews;
     return isNaN(updatedScore) ? airlineAirport.overall : updatedScore;
   }
   return newScore || 0;
