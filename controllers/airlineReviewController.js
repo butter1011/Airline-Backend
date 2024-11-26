@@ -51,6 +51,8 @@ const createAirlineReview = async (req, res) => {
     const updatedAirlineAirports = await AirlineAirport.find().sort({
       overall: -1,
     });
+    const updatedReviews = await getAirlineReviews();
+
     const wss = getWebSocketInstance();
 
     if (wss) {
@@ -60,6 +62,12 @@ const createAirlineReview = async (req, res) => {
             JSON.stringify({
               type: "airlineAirport",
               data: updatedAirlineAirports,
+            })
+          );
+          client.send(
+            JSON.stringify({
+              type: "airlineReviews",
+              data: updatedReviews,
             })
           );
         }
