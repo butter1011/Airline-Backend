@@ -40,8 +40,31 @@ const createAirlineReview = async (req, res) => {
     });
 
     const savedReview = await newAirlineReview.save();
-    const airlineScore = await calculateAirlineScores(savedReview);
 
+    const populatedReview = await AirlineReview.findById(savedReview._id)
+      .populate({
+        path: "reviewer",
+        select: "name profilePhoto _id",
+        model: UserInfo,
+      })
+      .populate({
+        path: "airline",
+        select: "name _id",
+        model: AirlineAirport,
+      })
+      .populate({
+        path: "from",
+        select: "name _id",
+        model: AirlineAirport,
+      })
+      .populate({
+        path: "to",
+        select: "name _id",
+        model: AirlineAirport,
+      })
+      .select("reviewer from to airline classTravel comment date");
+
+    const airlineScore = await calculateAirlineScores(savedReview);
     await airlineScore.save();
 
     // Send WebSocket update
@@ -66,7 +89,7 @@ const createAirlineReview = async (req, res) => {
 
     res.status(201).json({
       message: "Airline review created successfully",
-      review: savedReview,
+      review: populatedReview,
     });
   } catch (error) {
     console.error("Error creating airline review:", error);
@@ -139,56 +162,66 @@ const updateAirlineReview = async (req, res) => {
 
 ///
 /// Get all airline reviews
-const getAirlineReviews = async () => {
-  const reviews = await AirlineReview.find()
-    .populate({
-      path: "reviewer",
-      select: "name profilePhoto _id",
-      model: UserInfo,
-    })
-    .populate({
-      path: "airline",
-      select: "name _id",
-      model: AirlineAirport,
-    })
-    .populate({
-      path: "from",
-      select: "name _id",
-      model: AirlineAirport,
-    })
-    .populate({
-      path: "to",
-      select: "name _id",
-      model: AirlineAirport,
-    })
-    .sort({ rating: -1 });
+const getAirlineReviews = async (req, res) => {
+  try {
+    const reviews = await AirlineReview.find()
+      .populate({
+        path: "reviewer",
+        select: "name profilePhoto _id",
+        model: UserInfo,
+      })
+      .populate({
+        path: "airline",
+        select: "name _id",
+        model: AirlineAirport,
+      })
+      .populate({
+        path: "from",
+        select: "name _id",
+        model: AirlineAirport,
+      })
+      .populate({
+        path: "to",
+        select: "name _id",
+        model: AirlineAirport,
+      });
 
-  return reviews.map((review) => ({
-    id: review._id,
-    reviewer: {
-      name: review.reviewer.name,
-      profilePhoto: review.reviewer.profilePhoto,
-      _id: review.reviewer._id,
-    },
-    from: {
-      name: review.from.name,
-      _id: review.from._id,
-    },
-    to: {
-      name: review.to.name,
-      _id: review.to._id,
-    },
-    airline: {
-      name: review.airline.name,
-      _id: review.airline._id,
-    },
-    classTravel: review.classTravel,
-    comment: review.comment,
-    date: review.date,
-    rating: review.rating,
-  }));
+    const formattedReviews = reviews.map((review) => ({
+      id: review._id,
+      reviewer: {
+        name: review.reviewer.name,
+        profilePhoto: review.reviewer.profilePhoto,
+        _id: review.reviewer._id,
+      },
+      from: {
+        name: review.from.name,
+        _id: review.from._id,
+      },
+      to: {
+        name: review.to.name,
+        _id: review.to._id,
+      },
+      airline: {
+        name: review.airline.name,
+        _id: review.airline._id,
+      },
+      classTravel: review.classTravel,
+      comment: review.comment,
+      date: review.date,
+      rating: review.rating,
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: formattedReviews,
+    });
+  } catch (error) {
+    console.error("Error fetching airline reviews:", error);
+    res.status(500).json({
+      success: false,
+    });
+  }
 };
-
 module.exports = {
   createAirlineReview,
   getAirlineReviews,
