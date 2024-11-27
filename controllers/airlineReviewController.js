@@ -97,6 +97,9 @@ const createAirlineReview = async (req, res) => {
     }));
 
     const wss = getWebSocketInstance();
+    console.log("----------------");
+    console.log(formattedReviews);
+    console.log("----------------");
 
     if (wss) {
       wss.clients.forEach((client) => {
@@ -104,7 +107,7 @@ const createAirlineReview = async (req, res) => {
           client.send(
             JSON.stringify({
               type: "airlineAirport",
-              data: updatedAirlineAirports,
+              data: updatedAirlineAirports, 
             })
           );
           client.send(
