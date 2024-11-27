@@ -45,61 +45,7 @@ const createAirlineReview = async (req, res) => {
     await airlineScore.save();
 
     // Send WebSocket update
-    const updatedAirlineAirports = await AirlineAirport.find().sort({
-      overall: -1,
-    });
-    const updatedReviews = await AirlineReview.find()
-      .populate({
-        path: "reviewer",
-        select: "name profilePhoto _id",
-        model: UserInfo,
-      })
-      .populate({
-        path: "airline",
-        select: "name _id",
-        model: AirlineAirport,
-      })
-      .populate({
-        path: "from",
-        select: "name _id",
-        model: AirlineAirport,
-      })
-      .populate({
-        path: "to",
-        select: "name _id",
-        model: AirlineAirport,
-      })
-      .sort({ rating: -1 });
-
-    const formattedReviews = updatedReviews.map((review) => ({
-      id: review._id,
-      reviewer: {
-        name: review.reviewer.name,
-        profilePhoto: review.reviewer.profilePhoto,
-        _id: review.reviewer._id,
-      },
-      from: {
-        name: review.from.name,
-        _id: review.from._id,
-      },
-      to: {
-        name: review.to.name,
-        _id: review.to._id,
-      },
-      airline: {
-        name: review.airline.name,
-        _id: review.airline._id,
-      },
-      classTravel: review.classTravel,
-      comment: review.comment,
-      date: review.date,
-      rating: review.rating,
-    }));
-
     const wss = getWebSocketInstance();
-    console.log("----------------");
-    console.log(formattedReviews);
-    console.log("----------------");
 
     if (wss) {
       wss.clients.forEach((client) => {
@@ -107,13 +53,7 @@ const createAirlineReview = async (req, res) => {
           client.send(
             JSON.stringify({
               type: "airlineAirport",
-              data: updatedAirlineAirports, 
-            })
-          );
-          client.send(
-            JSON.stringify({
-              type: "airlineReviews",
-              data: formattedReviews,
+              data: updatedAirlineAirports,
             })
           );
         }
@@ -191,7 +131,7 @@ const updateAirlineReview = async (req, res) => {
     console.error("Error updating airline review:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-}; 
+};
 
 ///
 /// Get all airline reviews
