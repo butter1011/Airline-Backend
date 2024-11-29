@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   createAirlineAirport,
   updateAirlineAirport,
+  initializeClassCounts,
 } = require("../controllers/airportAirlineController");
 const {
   createUserInfo,
@@ -34,6 +35,6 @@ router.post("/api/v1/boarding-pass/update", updateBoardingPass);
 // Postman API
 router.post("/api/v1/airline-airport/create", createAirlineAirport);
 router.post("/api/v1/airline-airport/update", updateAirlineAirport);
-
+router.post("/api/v1/airline-airport/init", initializeClassCounts);
 
 module.exports = router;

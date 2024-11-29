@@ -17,20 +17,34 @@ const airlineAirportSchema = new mongoose.Schema({
     default: 0,
   },
 
-  firstClass: {
+  buinessClassCount: {
     type: Number,
+    default: 0,
+  },
+
+  economyClassCount: {
+    type: Number,
+    default: 0,
+  },
+
+  peyCount: {
+    type: Number,
+    default: 0,
   },
 
   buinessClass: {
     type: Number,
+    default: 0,
   },
 
   economyClass: {
     type: Number,
+    default: 0,
   },
 
   pey: {
     type: Number,
+    default: 0,
   },
 
   overall: {

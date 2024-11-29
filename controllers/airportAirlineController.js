@@ -4,6 +4,41 @@ const AirlineAirport = require("../models/airlinePortListsSchema");
 
 ///
 /// Create the Airline and Airport api
+
+const initializeClassCounts = async (req, res) => {
+  try {
+    const airlineAirports = await AirlineAirport.find();
+
+    const updates = await Promise.all(
+      airlineAirports.map(async (item) => {
+        const updated = await AirlineAirport.findByIdAndUpdate(
+          item._id,
+          {
+            $set: {
+              buinessClassCount: 0,
+              peyCount: 0,
+              economyClassCount: 0,
+            },
+          },
+          { new: true, runValidators: true }
+        );
+        return updated;
+      })
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Class counts initialized successfully",
+      data: updates,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Error initializing class counts",
+      error: error.message,
+    });
+  }
+};
 const createAirlineAirport = async (req, res) => {
   try {
     const { name, isAirline } = req.body;
@@ -127,4 +162,5 @@ module.exports = {
   createAirlineAirport,
   getAirlineAirport,
   updateAirlineAirport,
+  initializeClassCounts
 };

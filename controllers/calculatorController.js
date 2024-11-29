@@ -44,15 +44,9 @@ const calculateAirlineScores = async (airlineReview) => {
     scores[category] = compositeCategoryScore;
   });
 
-  const totalFeedbacks = totalLikes + totalDislikes;
-  let compositeScore;
-
-  if (totalFeedbacks > 0) {
-    compositeScore = (totalLikes / totalFeedbacks) * 10;
-  } else {
-    compositeScore = 5; // Default score if no feedbacks
-  }
-
+  let compositeScore =
+    Object.values(scores).reduce((sum, score) => sum + score, 0) /
+    categories.length;
   compositeScore = Math.min(Math.max(compositeScore, 1), 10);
 
   let airlineScore = await AirlineScore.findOne({
@@ -75,54 +69,55 @@ const calculateAirlineScores = async (airlineReview) => {
     });
     await airlineScore.save();
   }
+
   const airlineAirport = await AirlineAirport.findById(
     airlineReview.airline.toString()
   );
 
   if (airlineAirport) {
-    // Increment total reviews
     airlineAirport.totalReviews += 1;
-
-    // Update class-specific scores
     const classType = airlineReview.classTravel.toLowerCase();
-    if (classType === "first") {
-      airlineAirport.firstClass = updateClassScore(
-        airlineAirport.firstClass,
-        compositeScore,
-        airlineAirport.totalReviews
-      );
-    } else if (classType === "business") {
-      airlineAirport.buinessClass = updateClassScore(
-        airlineAirport.buinessClass,
-        compositeScore,
-        airlineAirport.totalReviews
-      );
-    } else if (classType === "economy") {
-      airlineAirport.economyClass = updateClassScore(
-        airlineAirport.economyClass,
-        compositeScore,
-        airlineAirport.totalReviews
-      );
-    } else if (classType === "premium economy") {
-      airlineAirport.pey = updateClassScore(
-        airlineAirport.pey,
-        compositeScore,
-        airlineAirport.totalReviews
-      );
-    }
-    // Update overall score
-    const previousOverallScore = airlineAirport.overall || 0;
-    airlineAirport.overall = updateOverallScore(airlineAirport);
 
-    // Update isIncreasing flag based on overall score change
+    switch (classType) {
+      case "business":
+        airlineAirport.businessClassCount += 1;
+        airlineAirport.businessClass = updateClassScore(  
+          airlineAirport.businessClass,
+          compositeScore,
+          airlineAirport.buinessClassCount
+        );
+        console.log(airlineAirport.businessClassCount);
+        console.log(airlineAirport.businessClass);
+        break;
+      case "economy":
+        airlineAirport.economyClassCount += 1;
+        airlineAirport.economyClass = updateClassScore(
+          airlineAirport.economyClass,
+          compositeScore,
+          airlineAirport.economyClassCount
+        );
+        console.log(airlineAirport.economyClassCount);
+        console.log(airlineAirport.economyClass)
+        break;
+      case "premium economy":
+        airlineAirport.peyCount += 1;
+        airlineAirport.pey = updateClassScore(
+          airlineAirport.pey,
+          compositeScore,
+          airlineAirport.peyCount
+        );
+        break;
+    }
+
+    const previousOverallScore = airlineAirport.overall || 0;
+    airlineAirport.overall = updateOverallScore(airlineAirport, compositeScore);
     airlineAirport.isIncreasing = airlineAirport.overall > previousOverallScore;
+
     await airlineAirport.save();
   }
 
   return airlineScore;
-};
-
-///
+}; ///
 /// Calculate the scores for an airport review
 const calculateAirportScores = async (airportReview) => {
   const categories = [
@@ -143,7 +138,7 @@ const calculateAirportScores = async (airportReview) => {
     let categoryLikes = 0;
     let categoryDislikes = 0;
 
-    Object.entries(categoryData).forEach(([key, value]) => {
+    Object.entries(categoryData).forEach((value) => {
       if (value === true) categoryLikes++;
       if (value === false) categoryDislikes++;
     });
@@ -164,21 +159,16 @@ const calculateAirportScores = async (airportReview) => {
     scores[category] = compositeCategoryScore;
   });
 
-  const totalFeedbacks = totalLikes + totalDislikes;
-  let compositeScore;
-
-  if (totalFeedbacks > 0) {
-    compositeScore = (totalLikes / totalFeedbacks) * 10;
-  } else {
-    compositeScore = 5; // Default score if no feedbacks
-  }
-
+  let compositeScore =
+    Object.values(scores).reduce((sum, score) => sum + score, 0) /
+    categories.length;
   compositeScore = Math.min(Math.max(compositeScore, 1), 10);
 
   let airportScore = await AirportScore.findOne({
     airportId: airportReview.airport.toString(),
   });
 
+  // save the category scores to the database
   if (airportScore) {
     airportScore.count += 1;
     categories.forEach((category) => {
@@ -196,6 +186,7 @@ const calculateAirportScores = async (airportReview) => {
     await airportScore.save();
   }
 
+  // Update the total reviews and class-specific scores
   const airlineAirport = await AirlineAirport.findById(
     airportReview.airport.toString()
   );
@@ -206,19 +197,11 @@ const calculateAirportScores = async (airportReview) => {
 
     // Update overall score
     const previousOverallScore = airlineAirport.overall || 0;
-    const newOverallScore = updateOverallScore(airlineAirport, compositeScore);
+    airlineAirport.overall = updateOverallScore(airlineAirport, compositeScore);
 
-    if (!isNaN(newOverallScore)) {
-      airlineAirport.overall = newOverallScore;
-
-      // Update isIncreasing flag based on overall score change
-      airlineAirport.isIncreasing = newOverallScore > previousOverallScore;
-      await airlineAirport.save();
-    } else {
-      console.error("Invalid overall score calculated:", newOverallScore);
-      airlineAirport.overall = previousOverallScore; // Keep the previous score if new score is NaN
-      await airlineAirport.save();
-    }
+    // Update isIncreasing flag based on overall score change
+    airlineAirport.isIncreasing = newOverallScore > previousOverallScore;
+    console.log(await airlineAirport.save());
   }
 
   return airportScore;
@@ -226,23 +209,17 @@ const calculateAirportScores = async (airportReview) => {
 
 ///
 /// Update the class-specific scores
-const updateClassScore = (currentScore, newScore, totalReviews) => {
-  if (currentScore !== undefined && currentScore !== null) {
-    return (currentScore * (totalReviews - 1) + newScore) / totalReviews;
-  }
-  return newScore;
+const updateClassScore = (currentScore, newScore, count) => {
+  return (currentScore * (count - 1) + newScore) / count;
 };
 
 ///
 /// Update the overall score
 const updateOverallScore = (airlineAirport, newScore) => {
-  if (airlineAirport.overall !== undefined && airlineAirport.overall !== null) {
-    const updatedScore =
-      (airlineAirport.overall * (airlineAirport.totalReviews - 1) + newScore) /
-      airlineAirport.totalReviews;
-    return isNaN(updatedScore) ? airlineAirport.overall : updatedScore;
-  }
-  return newScore || 0;
+  return (
+    (airlineAirport.overall * (airlineAirport.totalReviews - 1) + newScore) /
+    airlineAirport.totalReviews
+  );
 };
 
 module.exports = {
