@@ -92,8 +92,8 @@ const calculateAirlineScores = async (airlineReview) => {
         airlineAirport.totalReviews
       );
     } else if (classType === "business") {
-      airlineAirport.buinessClass = updateClassScore(
-        airlineAirport.buinessClass,
+      airlineAirport.businessClass = updateClassScore(
+        airlineAirport.businessClass,
         compositeScore,
         airlineAirport.totalReviews
       );

@@ -175,7 +175,7 @@ const getAirlineReviews = async (req, res) => {
       })
       .populate({
         path: "airline",
-        select: "name _id",
+        select: "name countryCode _id businessClass pey economyClass",
         model: AirlineAirport,
       })
       .populate({
@@ -207,11 +207,15 @@ const getAirlineReviews = async (req, res) => {
       airline: {
         name: review.airline.name,
         _id: review.airline._id,
+        businessClass: review.airline.businessClass,
+        pey: review.airline.pey,
+        economyClass: review.airline.economyClass,
       },
       classTravel: review.classTravel,
       comment: review.comment,
       date: review.date,
       rating: review.rating,
+      countryCode: review.airline.countryCode,
     }));
 
     res.status(200).json({
