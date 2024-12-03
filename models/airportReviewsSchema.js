@@ -17,6 +17,11 @@ const airportReviewSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "AirlineAirport",
   },
+  classTravel: {
+    type: String,
+    enum: ["Economy", "Business", "First", "Premium Economy"],
+    required: true,
+  },
 
   accessibility: {
     type: Object,
@@ -59,8 +64,9 @@ const airportReviewSchema = new mongoose.Schema({
   },
 
   rating: {
-    type: Number,
-    default: 0,
+    type: Object,
+    required: false,
+    default: {},
   },
 });
 

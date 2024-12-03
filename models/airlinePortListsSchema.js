@@ -32,7 +32,7 @@ const airlineAirportSchema = new mongoose.Schema({
     default: 0,
   },
 
-  buinessClass: {
+  businessClass: {
     type: Number,
     default: 0,
   },
