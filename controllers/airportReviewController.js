@@ -116,7 +116,7 @@ const updateAirportReview = async (req, res) => {
         select: "name _id",
         model: AirlineAirport,
       });
-    console.log("----------->", updatedReview);
+
 
     if (!updatedReview) {
       return res.status(404).json({ message: "Review not found after update" });
@@ -132,7 +132,7 @@ const updateAirportReview = async (req, res) => {
   }
 };
 const getAirportReviews = async (req, res) => {
-  console.log("getAirportReviews called");
+
   try {
     const reviews = await AirportReview.find()
       .populate({
