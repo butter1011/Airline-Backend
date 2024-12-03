@@ -66,7 +66,7 @@ const createAirportReview = async (req, res) => {
 
     res.status(201).json({
       message: "Airport review created successfully",
-      review: savedReview,
+      data: savedReview,
     });
   } catch (error) {
     console.error("Error creating airport review:", error);

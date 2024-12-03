@@ -1,5 +1,10 @@
 const UserInfo = require("../models/userInfoSchema");
-
+require("dotenv").config();
+const s3 = new AWS.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
+});
 const createUserInfo = async (req, res) => {
   let { name, whatsappNumber, email } = req.body;
 
@@ -81,8 +86,49 @@ const badgeEditUserInfo = async (req, res) => {
   }
 };
 
+const uploadAvatar = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).send("No file uploaded.");
+  }
+
+  try {
+    const file = req.file;
+    const key = req.body.key;
+    const url = await uploadFileToS3(file.buffer, key);
+    res.json({ success: true, url });
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    res.status(500).json({ success: false, error: "File upload failed" });
+  }
+};
+
+const uploadFileToS3 = (fileBuffer, fileName) => {
+  const key = `${fileName}`;
+
+  const uploadParams = {
+    Bucket: "airlinereview",
+    Key: key,
+    Body: fileBuffer,
+    ACL: "public-read",
+  };
+
+  return new Promise((resolve, reject) => {
+    s3.upload(uploadParams, (err, data) => {
+      if (err) {
+        console.log("Error", err);
+        reject(err);
+      }
+      if (data) {
+        console.log("Uploaded in", data.Location);
+        resolve(data.Location);
+      }
+    });
+  });
+};
+
 module.exports = {
   createUserInfo,
   editUserInfo,
   badgeEditUserInfo,
+  uploadAvatar,
 };
