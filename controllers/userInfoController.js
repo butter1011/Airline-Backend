@@ -49,7 +49,7 @@ const createUserInfo = async (req, res) => {
 ///
 /// Edit user
 const editUserInfo = async (req, res) => {
-  let { name, bio, _id } = req.body;
+  let { name, bio, _id, favoriteAirlines } = req.body;
   let editingUser = null;
 
   try {
@@ -58,6 +58,7 @@ const editUserInfo = async (req, res) => {
     // Create new user if doesn't exist
     editingUser.name = name;
     editingUser.bio = bio;
+    editingUser.favoriteAirlines = favoriteAirlines;
 
     await editingUser.save();
     res.json({ userData: editingUser, userState: 1 });
