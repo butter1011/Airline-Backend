@@ -89,7 +89,7 @@ const createAirlineReview = async (req, res) => {
 
     res.status(201).json({
       message: "Airline review created successfully",
-      review: populatedReview,
+      data: populatedReview,
     });
   } catch (error) {
     console.error("Error creating airline review:", error);
@@ -150,16 +150,41 @@ const updateAirlineReview = async (req, res) => {
 
 
     if (!updatedReview) {
-      return res.status(404).json({ message: "Review not found after update" });
+      return res.status(404).json({ success: false });
     }
 
+    const formattedReviews = {
+      id: updatedReview._id,
+      reviewer: {
+        name: updatedReview.reviewer.name,
+        profilePhoto: updatedReview.reviewer.profilePhoto,
+        _id: updatedReview.reviewer._id,
+      },
+      from: {
+        name: updatedReview.from.name,
+        _id: updatedReview.from._id,
+      },
+      to: {
+        name: updatedReview.to.name,
+        _id: updatedReview.to._id,
+      },
+      airline: {
+        name: updatedReview.airline.name,
+        _id: updatedReview.airline._id,
+      },
+      classTravel: updatedReview.classTravel,
+      comment: updatedReview.comment,
+      date: updatedReview.date,
+      rating: updatedReview.rating,
+    };
+    
     res.status(200).json({
-      message: "Review updated successfully",
-      review: updatedReview,
+      success: true,
+      data: formattedReviews,
     });
   } catch (error) {
     console.error("Error updating airline review:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ success: false });
   }
 };
 
