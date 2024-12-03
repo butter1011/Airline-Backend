@@ -15,7 +15,7 @@ const initializeClassCounts = async (req, res) => {
           item._id,
           {
             $set: {
-              buinessClassCount: 0,
+              businessClassCount: 0,
               peyCount: 0,
               economyClassCount: 0,
             },
