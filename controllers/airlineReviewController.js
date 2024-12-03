@@ -147,7 +147,7 @@ const updateAirlineReview = async (req, res) => {
         select: "name _id",
         model: AirlineAirport,
       });
-    console.log("----------->", updatedReview);
+
 
     if (!updatedReview) {
       return res.status(404).json({ message: "Review not found after update" });
