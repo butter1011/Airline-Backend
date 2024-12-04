@@ -86,8 +86,6 @@ const calculateAirlineScores = async (airlineReview) => {
           compositeScore,
           airlineAirport.buinessClassCount
         );
-        console.log(airlineAirport.businessClassCount);
-        console.log(airlineAirport.businessClass);
         break;
       case "economy":
         airlineAirport.economyClassCount += 1;
@@ -96,8 +94,6 @@ const calculateAirlineScores = async (airlineReview) => {
           compositeScore,
           airlineAirport.economyClassCount
         );
-        console.log(airlineAirport.economyClassCount);
-        console.log(airlineAirport.economyClass)
         break;
       case "premium economy":
         airlineAirport.peyCount += 1;
