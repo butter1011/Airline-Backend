@@ -31,7 +31,7 @@ const {
 router.post("/api/v1/user", createUserInfo);
 router.post("/api/v1/editUser", editUserInfo);
 // router.post("/api/v1/editUser/avatar", uploadUserAvatar);
-router.post('/api/v1/editUser/avatar', upload.single('image'), uploadUserAvatar);
+router.post('/api/v1/editUser/avatar', upload.single('avatar'), uploadUserAvatar);
 router.post("/api/v1/badgeEditUser", badgeEditUserInfo);
 router.post("/api/v1/airport-review", createAirportReview);
 router.post("/api/v1/airline-review", createAirlineReview);
