@@ -102,7 +102,6 @@ const createAirlineReview = async (req, res) => {
 const updateAirlineReview = async (req, res) => {
   try {
     const { feedbackId, user_id, reactionType } = req.body;
-    console.log("Received request to update airline review:", req.body);
 
     const existingReview = await AirlineReview.findById(feedbackId);
     if (!existingReview) {
@@ -110,8 +109,6 @@ const updateAirlineReview = async (req, res) => {
     }
 
     let updatedRating = existingReview.rating || {};
-    console.log("Updated Rating:", updatedRating);
-
     if (!updatedRating.hasOwnProperty(user_id)) {
       updatedRating[user_id] = reactionType;
     } else {

@@ -200,8 +200,7 @@ const calculateAirportScores = async (airportReview) => {
     airlineAirport.overall = updateOverallScore(airlineAirport, compositeScore);
 
     // Update isIncreasing flag based on overall score change
-    airlineAirport.isIncreasing = newOverallScore > previousOverallScore;
-    console.log(await airlineAirport.save());
+    airlineAirport.isIncreasing = airlineAirport.overall > previousOverallScore;
   }
 
   return airportScore;

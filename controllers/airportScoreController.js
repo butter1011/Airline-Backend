@@ -1,7 +1,6 @@
 const AirportScores = require("../models/airportScoresSchema");
 
 const getAirportScore = async (req, res) => {
-  console.log("==================================getAirportScore called");
   try {
     const airportScores = await AirportScores.find();
     res.status(200).json({

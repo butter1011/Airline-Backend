@@ -76,7 +76,6 @@ const createAirportReview = async (req, res) => {
 const updateAirportReview = async (req, res) => {
   try {
     const { feedbackId, user_id, reactionType } = req.body;
-    console.log("Received request to update airport review:", req.body);
 
     const existingReview = await AirportReview.findById(feedbackId);
     if (!existingReview) {
@@ -84,7 +83,6 @@ const updateAirportReview = async (req, res) => {
     }
 
     let updatedRating = existingReview.rating || {};
-    console.log("Updated Rating:", updatedRating);
 
     if (!updatedRating.hasOwnProperty(user_id)) {
       updatedRating[user_id] = reactionType;
@@ -116,7 +114,6 @@ const updateAirportReview = async (req, res) => {
         select: "name _id",
         model: AirlineAirport,
       });
-    console.log("----------->", updatedReview);
 
     if (!updatedReview) {
       return res.status(404).json({ message: "Review not found after update" });
@@ -132,7 +129,6 @@ const updateAirportReview = async (req, res) => {
   }
 };
 const getAirportReviews = async (req, res) => {
-  console.log("getAirportReviews called");
   try {
     const reviews = await AirportReview.find()
       .populate({
