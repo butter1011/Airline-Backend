@@ -3,7 +3,9 @@ const AirlineReview = require("../models/airlineReviewsSchema");
 const UserInfo = require("../models/userInfoSchema");
 const { calculateAirlineScores } = require("./calculatorController");
 const { getWebSocketInstance } = require("../utils/websocket");
+const { uploadFileToS3 } = require("../utils/awsUpload");
 const WebSocket = require("ws");
+const crypto = require("crypto");
 
 ///
 /// Create a new airline review
@@ -145,7 +147,6 @@ const updateAirlineReview = async (req, res) => {
         model: AirlineAirport,
       });
 
-
     if (!updatedReview) {
       return res.status(404).json({ success: false });
     }
@@ -174,7 +175,7 @@ const updateAirlineReview = async (req, res) => {
       date: updatedReview.date,
       rating: updatedReview.rating,
     };
-    
+
     res.status(200).json({
       success: true,
       data: formattedReviews,
@@ -182,6 +183,46 @@ const updateAirlineReview = async (req, res) => {
   } catch (error) {
     console.error("Error updating airline review:", error);
     res.status(500).json({ success: false });
+  }
+};
+
+///
+/// upload the images
+const uploadImagesAirline = async (req, res) => {
+  console.log("Received request to upload images", req.body);
+  if (!req.file) {
+    return res.status(400).send("No file uploaded.");
+  }
+
+  try {
+    const file = req.file;
+    const reviewId = req.body.id;
+
+    const fileType = file.originalname.split(".")[1].toLowerCase();
+    const url = await uploadFileToS3(
+      file.buffer,
+      `review/airline/${crypto.randomUUID()}.${fileType}`
+    );
+
+    console.log("URL:", url);
+
+    const review = await AirlineReview.findById(reviewId);
+    if (!review) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Review not found" });
+    }
+
+    if (!review.images) {
+      review.images = [];
+    }
+    review.images.push(url);
+    await review.save();
+
+    res.json({ reviewData: review });
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    res.status(500).json({ success: false, error: "File upload failed" });
   }
 };
 
@@ -255,4 +296,5 @@ module.exports = {
   createAirlineReview,
   getAirlineReviews,
   updateAirlineReview,
+  uploadImagesAirline,
 };

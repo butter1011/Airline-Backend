@@ -68,6 +68,18 @@ const airportReviewSchema = new mongoose.Schema({
     required: false,
     default: {},
   },
+
+  images: {
+    type: [String],
+    required: false,
+    default: [],
+  },
+
+  videos: {
+    type: [String],
+    required: false,
+    default: [],
+  }
 });
 
 const AirportReview = mongoose.model("AirportReview", airportReviewSchema);
