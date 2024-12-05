@@ -76,6 +76,18 @@ const airlineReviewSchema = new mongoose.Schema({
     required: false,
     default: {},
   },
+  
+  images: {
+    type: [String],
+    required: false,
+    default: [],
+  },
+
+  videos: {
+    type: [String],
+    required: false,
+    default: [],
+  }
 });
 
 const AirlineReview = mongoose.model("AirlineReview", airlineReviewSchema);

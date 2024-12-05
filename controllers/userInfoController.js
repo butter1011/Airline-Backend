@@ -1,10 +1,5 @@
 const UserInfo = require("../models/userInfoSchema");
-require("dotenv").config();
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION,
-});
+const { uploadFileToS3 } = require("../utils/awsUpload");
 const createUserInfo = async (req, res) => {
   let { name, whatsappNumber, email } = req.body;
 
@@ -49,7 +44,7 @@ const createUserInfo = async (req, res) => {
 ///
 /// Edit user
 const editUserInfo = async (req, res) => {
-  let { name, bio, _id } = req.body;
+  let { name, bio, _id, favoriteAirline } = req.body;
   let editingUser = null;
 
   try {
@@ -58,6 +53,9 @@ const editUserInfo = async (req, res) => {
     // Create new user if doesn't exist
     editingUser.name = name;
     editingUser.bio = bio;
+    if (favoriteAirline) {
+      editingUser.favoriteAirlines = favoriteAirline;
+    }
 
     await editingUser.save();
     res.json({ userData: editingUser, userState: 1 });
@@ -86,49 +84,38 @@ const badgeEditUserInfo = async (req, res) => {
   }
 };
 
-const uploadAvatar = async (req, res) => {
+const uploadUserAvatar = async (req, res) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
 
   try {
     const file = req.file;
-    const key = req.body.key;
-    const url = await uploadFileToS3(file.buffer, key);
-    res.json({ success: true, url });
+    const userId = req.body.userId;
+
+    const fileType = file.originalname.split(".")[1].toLowerCase();
+    const url = await uploadFileToS3(
+      file.buffer,
+      `avatar/${userId}.${fileType}`
+    );
+
+    const user = await UserInfo.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, error: "User not found" });
+    }
+
+    user.profilePhoto = url;
+    await user.save();
+
+    res.json({ userData: user, userState: 1 });
   } catch (error) {
     console.error("Error uploading file:", error);
     res.status(500).json({ success: false, error: "File upload failed" });
   }
 };
-
-const uploadFileToS3 = (fileBuffer, fileName) => {
-  const key = `${fileName}`;
-
-  const uploadParams = {
-    Bucket: "airlinereview",
-    Key: key,
-    Body: fileBuffer,
-    ACL: "public-read",
-  };
-
-  return new Promise((resolve, reject) => {
-    s3.upload(uploadParams, (err, data) => {
-      if (err) {
-        console.log("Error", err);
-        reject(err);
-      }
-      if (data) {
-        console.log("Uploaded in", data.Location);
-        resolve(data.Location);
-      }
-    });
-  });
-};
-
 module.exports = {
   createUserInfo,
   editUserInfo,
   badgeEditUserInfo,
-  uploadAvatar,
+  uploadUserAvatar,
 };

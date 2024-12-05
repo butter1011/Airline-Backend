@@ -86,8 +86,6 @@ const calculateAirlineScores = async (airlineReview) => {
           compositeScore,
           airlineAirport.businessClassCount
         );
-        console.log(airlineAirport.businessClassCount);
-        console.log(airlineAirport.businessClass);
         break;
       case "economy":
         airlineAirport.economyClassCount += 1;
@@ -96,8 +94,6 @@ const calculateAirlineScores = async (airlineReview) => {
           compositeScore,
           airlineAirport.economyClassCount
         );
-        console.log(airlineAirport.economyClassCount);
-        console.log(airlineAirport.economyClass)
         break;
       case "premium economy":
         airlineAirport.peyCount += 1;
@@ -200,8 +196,7 @@ const calculateAirportScores = async (airportReview) => {
     airlineAirport.overall = updateOverallScore(airlineAirport, compositeScore);
 
     // Update isIncreasing flag based on overall score change
-    airlineAirport.isIncreasing = newOverallScore > previousOverallScore;
-    console.log(await airlineAirport.save());
+    airlineAirport.isIncreasing = airlineAirport.overall > previousOverallScore;
   }
 
   return airportScore;

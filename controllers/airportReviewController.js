@@ -76,7 +76,6 @@ const createAirportReview = async (req, res) => {
 const updateAirportReview = async (req, res) => {
   try {
     const { feedbackId, user_id, reactionType } = req.body;
-    console.log("Received request to update airport review:", req.body);
 
     const existingReview = await AirportReview.findById(feedbackId);
     if (!existingReview) {
@@ -84,7 +83,6 @@ const updateAirportReview = async (req, res) => {
     }
 
     let updatedRating = existingReview.rating || {};
-    console.log("Updated Rating:", updatedRating);
 
     if (!updatedRating.hasOwnProperty(user_id)) {
       updatedRating[user_id] = reactionType;
@@ -116,7 +114,6 @@ const updateAirportReview = async (req, res) => {
         select: "name _id",
         model: AirlineAirport,
       });
-
 
     if (!updatedReview) {
       return res.status(404).json({ message: "Review not found after update" });
@@ -190,8 +187,50 @@ const getAirportReviews = async (req, res) => {
     });
   }
 };
+
+///
+/// upload the images
+const uploadImagesAirport = async (req, res) => {
+  console.log("Received request to upload images", req.body);
+  if (!req.file) {
+    return res.status(400).send("No file uploaded.");
+  }
+
+  try {
+    const file = req.file;
+    const reviewId = req.body.id;
+
+    const fileType = file.originalname.split(".")[1].toLowerCase();
+    const url = await uploadFileToS3(
+      file.buffer,
+      `review/airport/${crypto.randomUUID()}.${fileType}`
+    );
+
+    console.log("URL:", url);
+
+    const review = await AirportReview.findById(reviewId);
+    if (!review) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Review not found" });
+    }
+
+    if (!review.images) {
+      review.images = [];
+    }
+    review.images.push(url);
+    await review.save();
+
+    res.json({ reviewData: review });
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    res.status(500).json({ success: false, error: "File upload failed" });
+  }
+};
+
 module.exports = {
   createAirportReview,
   updateAirportReview,
   getAirportReviews,
+  uploadImagesAirport,
 };
