@@ -4,6 +4,8 @@ const AirportScore = require("../models/airportScoresSchema");
 const UserInfo = require("../models/userInfoSchema");
 const { calculateAirportScores } = require("./calculatorController");
 const { getWebSocketInstance } = require("../utils/websocket");
+const { uploadFileToS3 } = require("../utils/awsUpload");
+const crypto = require("crypto");
 
 ///
 /// Create a new airport review

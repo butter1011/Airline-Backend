@@ -4,7 +4,6 @@ const UserInfo = require("../models/userInfoSchema");
 const { calculateAirlineScores } = require("./calculatorController");
 const { getWebSocketInstance } = require("../utils/websocket");
 const { uploadFileToS3 } = require("../utils/awsUpload");
-const WebSocket = require("ws");
 const crypto = require("crypto");
 
 ///
