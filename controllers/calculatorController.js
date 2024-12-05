@@ -84,7 +84,7 @@ const calculateAirlineScores = async (airlineReview) => {
         airlineAirport.businessClass = updateClassScore(  
           airlineAirport.businessClass,
           compositeScore,
-          airlineAirport.buinessClassCount
+          airlineAirport.businessClassCount
         );
         break;
       case "economy":

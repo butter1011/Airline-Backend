@@ -129,6 +129,7 @@ const updateAirportReview = async (req, res) => {
   }
 };
 const getAirportReviews = async (req, res) => {
+
   try {
     const reviews = await AirportReview.find()
       .populate({
