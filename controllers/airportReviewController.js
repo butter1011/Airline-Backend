@@ -3,6 +3,7 @@ const AirportReview = require("../models/airportReviewsSchema");
 const AirportScore = require("../models/airportScoresSchema");
 const UserInfo = require("../models/userInfoSchema");
 const { calculateAirportScores } = require("./calculatorController");
+const WebSocket = require("ws");
 const { getWebSocketInstance } = require("../utils/websocket");
 const { uploadFileToS3 } = require("../utils/awsUpload");
 const crypto = require("crypto");
@@ -149,6 +150,8 @@ const getAirportReviews = async (req, res) => {
         select: "name _id",
         model: AirlineAirport,
       });
+
+    console.log("Reviews:", reviews);
 
     const formattedReviews = reviews.map((review) => ({
       id: review._id,

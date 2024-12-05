@@ -2,6 +2,7 @@ const AirlineAirport = require("../models/airlinePortListsSchema");
 const AirlineReview = require("../models/airlineReviewsSchema");
 const UserInfo = require("../models/userInfoSchema");
 const { calculateAirlineScores } = require("./calculatorController");
+const WebSocket = require("ws");
 const { getWebSocketInstance } = require("../utils/websocket");
 const { uploadFileToS3 } = require("../utils/awsUpload");
 const crypto = require("crypto");
