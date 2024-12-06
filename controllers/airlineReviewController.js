@@ -152,7 +152,7 @@ const updateAirlineReview = async (req, res) => {
     }
 
     const formattedReviews = {
-      id: updatedReview._id,
+      _id: updatedReview._id,
       reviewer: {
         name: updatedReview.reviewer.name,
         profilePhoto: updatedReview.reviewer.profilePhoto,
@@ -253,7 +253,7 @@ const getAirlineReviews = async (req, res) => {
       });
 
     const formattedReviews = reviews.map((review) => ({
-      id: review._id,
+      _id: review._id,
       reviewer: {
         name: review.reviewer.name,
         profilePhoto: review.reviewer.profilePhoto,
