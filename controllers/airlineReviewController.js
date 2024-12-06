@@ -217,9 +217,9 @@ const uploadImagesAirline = async (req, res) => {
       review.images = [];
     }
     review.images.push(url);
-    await review.save();
+    const updateReview = await review.save();
 
-    res.json({ reviewData: review });
+    res.json({ data: updateReview, success: true });
   } catch (error) {
     console.error("Error uploading file:", error);
     res.status(500).json({ success: false, error: "File upload failed" });

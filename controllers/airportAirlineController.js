@@ -78,7 +78,7 @@ const createAirlineAirport = async (req, res) => {
 /// Get the Airline and Airport api
 const getAirlineAirport = async (req, res) => {
   try {
-    const airlineAirports = await AirlineAirport.find().sort({ overall: -1 });
+    const airlineAirports = await AirlineAirport.find().sort({ overall: -1 }).limit(5);
 
     res.status(200).json({
       message: "Airline/Airport data retrieved successfully",
@@ -89,7 +89,6 @@ const getAirlineAirport = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
 ///
 /// Update the Airline and Airport api
 const updateAirlineAirport = async (req, res) => {

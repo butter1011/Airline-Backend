@@ -42,12 +42,36 @@ const createAirportReview = async (req, res) => {
 
     const savedReview = await newAirportReview.save();
 
+    const populatedReview = await AirportReview.findById(savedReview._id)
+    .populate({
+      path: "reviewer",
+      select: "name profilePhoto _id",
+      model: UserInfo,
+    })
+    .populate({
+      path: "airline",
+      select: "name _id",
+      model: AirlineAirport,
+    })
+    .populate({
+      path: "from",
+      select: "name _id",
+      model: AirlineAirport,
+    })
+    .populate({
+      path: "to",
+      select: "name _id",
+      model: AirlineAirport,
+    })
+    .select("reviewer from to airline classTravel comment date");
+
+
     let airportScore = await AirportScore.findOne({ airportId: airport });
     if (!airportScore) {
       airportScore = new AirportScore({ airportId: airport });
     }
 
-    airportScore = await calculateAirportScores(savedReview, airportScore);
+    airportScore = await calculateAirportScores(savedReview);
     await airportScore.save();
 
     // Send WebSocket update
@@ -69,7 +93,7 @@ const createAirportReview = async (req, res) => {
 
     res.status(201).json({
       message: "Airport review created successfully",
-      data: savedReview,
+      data: populatedReview,  
     });
   } catch (error) {
     console.error("Error creating airport review:", error);
@@ -132,7 +156,6 @@ const updateAirportReview = async (req, res) => {
   }
 };
 const getAirportReviews = async (req, res) => {
-
   try {
     const reviews = await AirportReview.find()
       .populate({
@@ -222,9 +245,9 @@ const uploadImagesAirport = async (req, res) => {
       review.images = [];
     }
     review.images.push(url);
-    await review.save();
+    const updateReview = await review.save();
 
-    res.json({ reviewData: review });
+    res.json({ data: updateReview, success: true });
   } catch (error) {
     console.error("Error uploading file:", error);
     res.status(500).json({ success: false, error: "File upload failed" });
