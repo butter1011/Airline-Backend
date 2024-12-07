@@ -278,6 +278,7 @@ const getAirlineReviews = async (req, res) => {
       comment: review.comment,
       date: review.date,
       rating: review.rating,
+      images: review.images,
       countryCode: review.airline.countryCode,
     }));
 
