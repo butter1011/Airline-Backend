@@ -54,16 +54,10 @@ const createAirportReview = async (req, res) => {
       model: AirlineAirport,
     })
     .populate({
-      path: "from",
+      path: "airport",
       select: "name _id",
       model: AirlineAirport,
-    })
-    .populate({
-      path: "to",
-      select: "name _id",
-      model: AirlineAirport,
-    })
-    .select("reviewer from to airline classTravel comment date");
+    });
 
 
     let airportScore = await AirportScore.findOne({ airportId: airport });
