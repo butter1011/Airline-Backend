@@ -40,33 +40,26 @@ const createAirportReview = async (req, res) => {
       comment,
     });
 
+    let compositeScore = await calculateAirportScores(newAirportReview);
+    newAirportReview.score = compositeScore;
+
     const savedReview = await newAirportReview.save();
-
     const populatedReview = await AirportReview.findById(savedReview._id)
-    .populate({
-      path: "reviewer",
-      select: "name profilePhoto _id",
-      model: UserInfo,
-    })
-    .populate({
-      path: "airline",
-      select: "name _id",
-      model: AirlineAirport,
-    })
-    .populate({
-      path: "airport",
-      select: "name _id",
-      model: AirlineAirport,
-    });
-
-
-    let airportScore = await AirportScore.findOne({ airportId: airport });
-    if (!airportScore) {
-      airportScore = new AirportScore({ airportId: airport });
-    }
-
-    airportScore = await calculateAirportScores(savedReview);
-    await airportScore.save();
+      .populate({
+        path: "reviewer",
+        select: "name profilePhoto _id",
+        model: UserInfo,
+      })
+      .populate({
+        path: "airline",
+        select: "name _id",
+        model: AirlineAirport,
+      })
+      .populate({
+        path: "airport",
+        select: "name _id",
+        model: AirlineAirport,
+      });
 
     // Send WebSocket update
     const updatedAirlineAirports = await AirlineAirport.find().sort({
@@ -87,7 +80,7 @@ const createAirportReview = async (req, res) => {
 
     res.status(201).json({
       message: "Airport review created successfully",
-      data: populatedReview,  
+      data: populatedReview,
     });
   } catch (error) {
     console.error("Error creating airport review:", error);

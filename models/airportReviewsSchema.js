@@ -79,7 +79,13 @@ const airportReviewSchema = new mongoose.Schema({
     type: [String],
     required: false,
     default: [],
-  }
+  },
+
+  score: {
+    type: Number,
+    required: false,
+    default: 0,
+  },
 });
 
 const AirportReview = mongoose.model("AirportReview", airportReviewSchema);

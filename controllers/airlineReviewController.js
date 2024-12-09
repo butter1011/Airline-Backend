@@ -41,6 +41,9 @@ const createAirlineReview = async (req, res) => {
       comment,
     });
 
+    const compositeScore = await calculateAirlineScores(newAirlineReview);
+    newAirlineReview.score = compositeScore;
+
     const savedReview = await newAirlineReview.save();
 
     const populatedReview = await AirlineReview.findById(savedReview._id)
@@ -63,11 +66,7 @@ const createAirlineReview = async (req, res) => {
         path: "to",
         select: "name _id",
         model: AirlineAirport,
-      })
-      .select("reviewer from to airline classTravel comment date");
-
-    const airlineScore = await calculateAirlineScores(savedReview);
-    await airlineScore.save();
+      });
 
     // Send WebSocket update
     const updatedAirlineAirports = await AirlineAirport.find().sort({

@@ -76,7 +76,7 @@ const airlineReviewSchema = new mongoose.Schema({
     required: false,
     default: {},
   },
-  
+
   images: {
     type: [String],
     required: false,
@@ -87,7 +87,13 @@ const airlineReviewSchema = new mongoose.Schema({
     type: [String],
     required: false,
     default: [],
-  }
+  },
+  
+  score: {
+    type: Number,
+    required: false,
+    default: 0,
+  },
 });
 
 const AirlineReview = mongoose.model("AirlineReview", airlineReviewSchema);

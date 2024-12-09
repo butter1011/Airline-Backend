@@ -112,7 +112,7 @@ const calculateAirlineScores = async (airlineReview) => {
     await airlineAirport.save();
   }
 
-  return airlineScore;
+  return compositeScore;
 }; ///
 /// Calculate the scores for an airport review
 const calculateAirportScores = async (airportReview) => {
@@ -199,7 +199,7 @@ const calculateAirportScores = async (airportReview) => {
     airlineAirport.isIncreasing = airlineAirport.overall > previousOverallScore;
   }
 
-  return airportScore;
+  return compositeScore;
 };
 
 ///
