@@ -174,7 +174,7 @@ const updateAirlineReview = async (req, res) => {
       date: updatedReview.date,
       rating: updatedReview.rating,
     };
-
+    console.log("Formatted Reviews:", formattedReviews);
     res.status(200).json({
       success: true,
       data: formattedReviews,

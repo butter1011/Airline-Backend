@@ -128,18 +128,39 @@ const updateAirportReview = async (req, res) => {
         select: "name _id",
         model: AirlineAirport,
       });
-
+    console.log("updatedReview", updatedReview);
     if (!updatedReview) {
       return res.status(404).json({ message: "Review not found after update" });
     }
 
+    const formattedReviews = {
+      _id: updatedReview._id,
+      reviewer: {
+        name: updatedReview.reviewer.name,
+        profilePhoto: updatedReview.reviewer.profilePhoto,
+        _id: updatedReview.reviewer._id,
+      },
+      airport: {
+        name: updatedReview.airport.name,
+        _id: updatedReview.airport._id,
+      },
+      airline: {
+        name: updatedReview.airline.name,
+        _id: updatedReview.airline._id,
+      },
+      classTravel: updatedReview.classTravel,
+      comment: updatedReview.comment,
+      date: updatedReview.date,
+      rating: updatedReview.rating,
+    };
+    console.log("Formatted Reviews:", formattedReviews);
     res.status(200).json({
-      message: "Review updated successfully",
-      review: updatedReview,
+      success: true,
+      data: formattedReviews,
     });
   } catch (error) {
     console.error("Error updating airline review:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ success: false });
   }
 };
 const getAirportReviews = async (req, res) => {
