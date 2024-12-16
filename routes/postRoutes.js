@@ -13,6 +13,7 @@ const {
   editUserInfo,
   badgeEditUserInfo,
   uploadUserAvatar,
+  increaseUserPoints
 } = require("../controllers/userInfoController");
 const {
   createAirportReview,
@@ -37,6 +38,7 @@ router.post(
   upload.single("avatar"),
   uploadUserAvatar
 );
+router.post("/api/v1/increase-user-points", increaseUserPoints);
 router.post("/api/v1/badgeEditUser", badgeEditUserInfo);
 router.post("/api/v1/airport-review", createAirportReview);
 router.post("/api/v1/airline-review", createAirlineReview);

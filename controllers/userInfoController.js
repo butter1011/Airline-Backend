@@ -113,9 +113,31 @@ const uploadUserAvatar = async (req, res) => {
     res.status(500).json({ success: false, error: "File upload failed" });
   }
 };
+
+const increaseUserPoints = async (req, res) => {
+  const { _id, pointsToAdd } = req.body;
+  
+  try {
+    const user = await UserInfo.findById(_id);
+    if (!user) {
+      console.log("User not found");
+      return res.status(404).json({ success: false, error: "User not found" });
+      
+    }
+
+    user.points = Number(user.points) + Number(pointsToAdd);
+    await user.save();
+
+    res.json({ userData: user, userState: 1 });
+  } catch (error) {
+    console.error("Error increasing points:", error);
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+};
 module.exports = {
   createUserInfo,
   editUserInfo,
   badgeEditUserInfo,
   uploadUserAvatar,
+  increaseUserPoints,
 };
