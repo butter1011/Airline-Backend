@@ -251,7 +251,7 @@ const getAirlineReviews = async (req, res) => {
         model: AirlineAirport,
       });
 
-    const formattedReviews = reviews.map((review) => ({
+    const formattedReviews = reviews.map((review) => ({    
       _id: review._id,
       reviewer: {
         name: review.reviewer.name,

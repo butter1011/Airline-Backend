@@ -116,16 +116,27 @@ const uploadUserAvatar = async (req, res) => {
 
 const increaseUserPoints = async (req, res) => {
   const { _id, pointsToAdd } = req.body;
-  
+
   try {
     const user = await UserInfo.findById(_id);
     if (!user) {
       console.log("User not found");
       return res.status(404).json({ success: false, error: "User not found" });
-      
     }
 
     user.points = Number(user.points) + Number(pointsToAdd);
+
+    if (user.points >= 500 && user.points < 3000) {
+      user.selectedbadges = "Needs Improvement";
+    } else if (user.points >= 3000 && user.points < 5000) {
+      user.selectedbadges = "Fair Reviewer";
+    } else if (user.points >= 5000 && user.points < 7000) {
+      user.selectedbadges = "Good Reviewer";
+    } else if (user.points >= 7000 && user.points < 10000) {
+      user.selectedbadges = "Excellent Reviewer";
+    } else if (user.points >= 10000) {
+      user.selectedbadges = "Top Reviewer";
+    }
     await user.save();
 
     res.json({ userData: user, userState: 1 });

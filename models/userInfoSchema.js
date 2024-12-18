@@ -23,7 +23,7 @@ const userInfoSchema = new mongoose.Schema(
     selectedbadges: {
       type: String,
       required: false,
-      default: "TopReviewer",
+      default: "No Review",
     },
 
     badgeNumber: {
