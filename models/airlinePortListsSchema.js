@@ -96,6 +96,19 @@ const airlineAirportSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+
+  scoreHistory: [
+    {
+      score: {
+        type: Number,
+        required: true,
+      },
+      timestamp: {
+        type: Date,
+        required: true,
+      },
+    },
+  ],
 });
 
 const AirlineAirport = mongoose.model("AirlineAirport", airlineAirportSchema);

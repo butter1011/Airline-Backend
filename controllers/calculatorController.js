@@ -107,6 +107,23 @@ const calculateAirlineScores = async (airlineReview) => {
 
     const previousOverallScore = airlineAirport.overall || 0;
     airlineAirport.overall = updateOverallScore(airlineAirport, compositeScore);
+
+    // Save score history
+    if (!airlineAirport.scoreHistory) {
+      airlineAirport.scoreHistory = [];
+    }
+    
+    airlineAirport.scoreHistory.push({
+      score: airlineAirport.overall,
+      timestamp: new Date()
+    });
+
+    // Keep only last 24 hours of data
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    airlineAirport.scoreHistory = airlineAirport.scoreHistory.filter(
+      record => record.timestamp >= oneDayAgo
+    );
+
     airlineAirport.isIncreasing = airlineAirport.overall > previousOverallScore;
 
     await airlineAirport.save();
