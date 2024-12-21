@@ -40,7 +40,7 @@ const userInfoSchema = new mongoose.Schema(
     points: {
       type: Number,
       required: false,
-      default: +500,
+      default: +0,
     },
 
     travelHistory: {
