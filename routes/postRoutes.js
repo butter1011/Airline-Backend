@@ -13,7 +13,7 @@ const {
   editUserInfo,
   badgeEditUserInfo,
   uploadUserAvatar,
-  increaseUserPoints
+  increaseUserPoints,
 } = require("../controllers/userInfoController");
 const {
   createAirportReview,
@@ -24,6 +24,8 @@ const {
   createAirlineReview,
   updateAirlineReview,
   uploadImagesAirline,
+  uploadVideoAirline,
+  uploadVideoAirport,
 } = require("../controllers/airlineReviewController");
 const {
   createBoardingPass,
@@ -55,6 +57,9 @@ router.post(
   upload.single("files"),
   uploadImagesAirport
 );
+
+router.post("/api/v1/airline-review/upload-media", uploadVideoAirline);
+router.post("/api/v1/airport-review/upload-media", uploadVideoAirport);
 
 router.post("/api/v1/airline-review/update", updateAirlineReview);
 router.post("/api/v1/airport-review/update", updateAirportReview);
