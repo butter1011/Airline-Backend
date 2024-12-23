@@ -208,6 +208,7 @@ const getAirportReviews = async (req, res) => {
       date: review.date,
       rating: review.rating,
       images: review.images,
+      videos: review.videos,
       countryCode: review.airport.countryCode, 
       scorere: review.score,
     }));
