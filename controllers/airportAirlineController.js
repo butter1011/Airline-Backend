@@ -113,29 +113,42 @@ const updateAirlineAirport = async (req, res) => {
       countryCode,
     } = req.body;
 
+    const updateFields = {
+      name,
+      isAirline,
+      totalReviews,
+      firstClass,
+      businessClass,
+      economyClass,
+      pey,
+      overall,
+      location,
+      logoImage,
+      iataCode,
+      countryCode,
+    };
+
+    if (descriptionBio !== null) {
+      updateFields.descriptionBio = descriptionBio;
+    }
+
+    if (trendingBio !== null) {
+      updateFields.trendingBio = trendingBio;
+    }
+
+    if (perksBio !== null) {
+      updateFields.perksBio = perksBio;
+    }
+
+    if (backgroundImage !== null) {
+      updateFields.backgroundImage = backgroundImage;
+    }
+
     const updatedAirlineAirport = await AirlineAirport.findByIdAndUpdate(
       { _id: id },
-      {
-        name,
-        isAirline,
-        totalReviews,
-        firstClass,
-        businessClass,
-        economyClass,
-        pey,
-        overall,
-        location,
-        logoImage,
-        backgroundImage,
-        descriptionBio,
-        trendingBio,
-        perksBio,
-        iataCode,
-        countryCode,
-      },
+      updateFields,
       { new: true, runValidators: true }
     );
-
     if (!updatedAirlineAirport) {
       return res.status(404).json({
         success: false,
