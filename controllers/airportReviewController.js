@@ -12,6 +12,7 @@ const crypto = require("crypto");
 /// Create a new airport review
 const createAirportReview = async (req, res) => {
   try {
+    console.log("createAirportReview:----------------------");
     const {
       reviewer,
       airport,

@@ -20,6 +20,7 @@ const calculateAirlineScores = async (airlineReview) => {
 
   categories.forEach((category) => {
     const categoryData = airlineReview[category];
+    console.log("Airline categoryData:----------------------", categoryData);
     let categoryLikes = 0;
     let categoryDislikes = 0;
 
@@ -133,6 +134,7 @@ const calculateAirlineScores = async (airlineReview) => {
 }; ///
 /// Calculate the scores for an airport review
 const calculateAirportScores = async (airportReview) => {
+  console.log("Airport airportReview:----------------------", airportReview);
   const categories = [
     "accessibility",
     "waitTimes",
@@ -148,10 +150,11 @@ const calculateAirportScores = async (airportReview) => {
 
   categories.forEach((category) => {
     const categoryData = airportReview[category];
+    console.log("categoryData:----------------------", categoryData);
     let categoryLikes = 0;
     let categoryDislikes = 0;
 
-    Object.entries(categoryData).forEach((value) => {
+    Object.values(categoryData).forEach((value) => {
       if (value === true) categoryLikes++;
       if (value === false) categoryDislikes++;
     });
