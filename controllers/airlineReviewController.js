@@ -6,6 +6,7 @@ const WebSocket = require("ws");
 const { getWebSocketInstance } = require("../utils/websocket");
 const { uploadFileToS3 } = require("../utils/awsUpload");
 const crypto = require("crypto");
+const { updateAirportReview } = require("./airportReviewController");
 
 ///
 /// Create a new airline review
@@ -186,9 +187,9 @@ const updateAirlineReview = async (req, res) => {
 };
 
 ///
-/// upload the images
-const uploadImagesAirline = async (req, res) => {
-  console.log("Received request to upload images", req.body);
+/// upload the media to the s3 bucket
+const uploadAirlineMedia = async (req, res) => {
+  console.log("Received request to upload media", req.body);
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
@@ -196,14 +197,24 @@ const uploadImagesAirline = async (req, res) => {
   try {
     const file = req.file;
     const reviewId = req.body.id;
+    const mediaType = req.body.type; // 'image' or 'video'
 
     const fileType = file.originalname.split(".")[1].toLowerCase();
     const url = await uploadFileToS3(
       file.buffer,
-      `review/airline/${crypto.randomUUID()}.${fileType}`
+      `review/${
+        mediaType === "image"
+          ? "airline"
+          : mediaType === "video"
+          ? "airline"
+          : "airport"
+      }/${crypto.randomUUID()}.${fileType}`
     );
 
-    console.log("URL:", url);
+    console.log(
+      `${mediaType.charAt(0).toUpperCase() + mediaType.slice(1)} URL:`,
+      url
+    );
 
     const review = await AirlineReview.findById(reviewId);
     if (!review) {
@@ -212,98 +223,29 @@ const uploadImagesAirline = async (req, res) => {
         .json({ success: false, error: "Review not found" });
     }
 
-    if (!review.images) {
-      review.images = [];
+    if (mediaType === "image") {
+      if (!review.images) {
+        review.images = [];
+      }
+      review.images.push(url);
+    } else {
+      if (!review.videos) {
+        review.videos = [];
+      }
+      review.videos.push(url);
     }
-    review.images.push(url);
+
     const updateReview = await review.save();
 
     res.json({ data: updateReview, success: true });
   } catch (error) {
-    console.error("Error uploading file:", error);
-    res.status(500).json({ success: false, error: "File upload failed" });
+    console.error(`Error uploading ${req.body.type}:`, error);
+    res
+      .status(500)
+      .json({ success: false, error: `${req.body.type} upload failed` });
   }
 };
 
-///
-/// upload airline video
-const uploadVideoAirline = async (req, res) => {
-  console.log("Received request to upload video", req.body);
-  if (!req.file) {
-    return res.status(400).send("No file uploaded.");
-  }
-
-  try {
-    const file = req.file;
-    const reviewId = req.body.id;
-
-    const fileType = file.originalname.split(".")[1].toLowerCase();
-    const url = await uploadFileToS3(
-      file.buffer,
-      `review/airline/video/${crypto.randomUUID()}.${fileType}`
-    );
-
-    console.log("Video URL:", url);
-
-    const review = await AirlineReview.findById(reviewId);
-    if (!review) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Review not found" });
-    }
-
-    if (!review.videos) {
-      review.videos = [];
-    }
-    review.videos.push(url);
-    const updateReview = await review.save();
-
-    res.json({ data: updateReview, success: true });
-  } catch (error) {
-    console.error("Error uploading video:", error);
-    res.status(500).json({ success: false, error: "Video upload failed" });
-  }
-};
-
-///
-/// upload airport video
-const uploadVideoAirport = async (req, res) => {
-  console.log("Received request to upload video", req.body);
-  if (!req.file) {
-    return res.status(400).send("No file uploaded.");
-  }
-
-  try {
-    const file = req.file;
-    const reviewId = req.body.id;
-
-    const fileType = file.originalname.split(".")[1].toLowerCase();
-    const url = await uploadFileToS3(
-      file.buffer,
-      `review/airport/video/${crypto.randomUUID()}.${fileType}`
-    );
-
-    console.log("Video URL:", url);
-
-    const review = await AirlineReview.findById(reviewId);
-    if (!review) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Review not found" });
-    }
-
-    if (!review.videos) {
-      review.videos = [];
-    }
-    review.videos.push(url);
-    const updateReview = await review.save();
-
-    res.json({ data: updateReview, success: true });
-  } catch (error) {
-    console.error("Error uploading video:", error);
-    res.status(500).json({ success: false, error: "Video upload failed" });
-  }
-};
 
 ///
 /// Get all airline reviews
@@ -359,6 +301,7 @@ const getAirlineReviews = async (req, res) => {
       rating: review.rating,
       images: review.images,
       countryCode: review.airline.countryCode,
+      score: review.score,
     }));
 
     res.status(200).json({
@@ -375,8 +318,6 @@ const getAirlineReviews = async (req, res) => {
 module.exports = {
   createAirlineReview,
   getAirlineReviews,
+  uploadAirlineMedia,
   updateAirlineReview,
-  uploadImagesAirline,
-  uploadVideoAirline,
-  uploadVideoAirport,
 };

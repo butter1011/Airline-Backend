@@ -208,7 +208,8 @@ const getAirportReviews = async (req, res) => {
       date: review.date,
       rating: review.rating,
       images: review.images,
-      countryCode: review.airport.countryCode, // Added countryCode here
+      countryCode: review.airport.countryCode, 
+      scorere: review.score,
     }));
 
     res.status(200).json({
@@ -225,9 +226,9 @@ const getAirportReviews = async (req, res) => {
 };
 
 ///
-/// upload the images
-const uploadImagesAirport = async (req, res) => {
-  console.log("Received request to upload images", req.body);
+/// Upload the media to the S3 bucket
+const uploadAirportMedia = async (req, res) => {
+  console.log("Received request to upload media", req.body);
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
@@ -235,6 +236,7 @@ const uploadImagesAirport = async (req, res) => {
   try {
     const file = req.file;
     const reviewId = req.body.id;
+    const mediaType = req.body.type; // 'image' or 'video'
 
     const fileType = file.originalname.split(".")[1].toLowerCase();
     const url = await uploadFileToS3(
@@ -242,25 +244,38 @@ const uploadImagesAirport = async (req, res) => {
       `review/airport/${crypto.randomUUID()}.${fileType}`
     );
 
-    console.log("URL:", url);
+    console.log(
+      `${mediaType.charAt(0).toUpperCase() + mediaType.slice(1)} URL:`,
+      url
+    );
 
-    const review = await AirportReview.findById(reviewId);
+    const review = await AirlineReview.findById(reviewId);
     if (!review) {
       return res
         .status(404)
         .json({ success: false, error: "Review not found" });
     }
 
-    if (!review.images) {
-      review.images = [];
+    if (mediaType === "image") {
+      if (!review.images) {
+        review.images = [];
+      }
+      review.images.push(url);
+    } else {
+      if (!review.videos) {
+        review.videos = [];
+      }
+      review.videos.push(url);
     }
-    review.images.push(url);
+
     const updateReview = await review.save();
 
     res.json({ data: updateReview, success: true });
   } catch (error) {
-    console.error("Error uploading file:", error);
-    res.status(500).json({ success: false, error: "File upload failed" });
+    console.error(`Error uploading ${req.body.type}:`, error);
+    res
+      .status(500)
+      .json({ success: false, error: `${req.body.type} upload failed` });
   }
 };
 
@@ -268,5 +283,5 @@ module.exports = {
   createAirportReview,
   updateAirportReview,
   getAirportReviews,
-  uploadImagesAirport,
+  uploadAirportMedia,
 };

@@ -18,14 +18,12 @@ const {
 const {
   createAirportReview,
   updateAirportReview,
-  uploadImagesAirport,
+  uploadAirportMedia,
 } = require("../controllers/airportReviewController");
 const {
   createAirlineReview,
+  uploadAirlineMedia,
   updateAirlineReview,
-  uploadImagesAirline,
-  uploadVideoAirline,
-  uploadVideoAirport,
 } = require("../controllers/airlineReviewController");
 const {
   createBoardingPass,
@@ -46,20 +44,16 @@ router.post("/api/v1/airport-review", createAirportReview);
 router.post("/api/v1/airline-review", createAirlineReview);
 router.post("/api/v1/boarding-pass", createBoardingPass);
 router.post("/api/v1/boarding-pass/update", updateBoardingPass);
-
 router.post(
-  "/api/v1/airline-review/upload-images",
+  "/api/v1/airline-review/upload-media",
   upload.single("files"),
-  uploadImagesAirline
+  uploadAirlineMedia
 );
 router.post(
-  "/api/v1/airport-review/upload-images",
+  "/api/v1/airport-review/upload-media",
   upload.single("files"),
-  uploadImagesAirport
+  uploadAirportMedia
 );
-
-router.post("/api/v1/airline-review/upload-media", uploadVideoAirline);
-router.post("/api/v1/airport-review/upload-media", uploadVideoAirport);
 
 router.post("/api/v1/airline-review/update", updateAirlineReview);
 router.post("/api/v1/airport-review/update", updateAirportReview);
