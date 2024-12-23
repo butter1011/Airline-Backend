@@ -157,9 +157,38 @@ const updateAirlineAirport = async (req, res) => {
   }
 };
 
+///
+/// Get the Airline and Airport api
+const getAirlineAirportLists = async (req, res) => {
+  try {
+    const airlineList = await AirlineAirport.find({ isAirline: true })
+      .select("name logoImage overall")
+      .sort({ overall: -1 });
+    const airportList = await AirlineAirport.find({ isAirline: false })
+      .select("name logoImage overall")
+      .sort({ overall: -1 });
+    res.status(200).json({
+      success: true,
+      message: "Airline and Airport lists retrieved successfully",
+      data: {
+        airlines: airlineList,
+        airports: airportList,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching airline and airport lists:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error retrieving Airline and Airport lists",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createAirlineAirport,
   getAirlineAirport,
   updateAirlineAirport,
   initializeClassCounts,
+  getAirlineAirportLists,
 };
