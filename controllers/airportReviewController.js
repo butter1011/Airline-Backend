@@ -12,7 +12,6 @@ const crypto = require("crypto");
 /// Create a new airport review
 const createAirportReview = async (req, res) => {
   try {
-    console.log("createAirportReview:----------------------");
     const {
       reviewer,
       airport,
@@ -74,6 +73,7 @@ const createAirportReview = async (req, res) => {
           JSON.stringify({
             type: "airlineAirport",
             data: updatedAirlineAirports,
+            review: populatedReview,
           })
         );
       });

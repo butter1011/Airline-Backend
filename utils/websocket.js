@@ -13,10 +13,10 @@ const initWebSocket = (server) => {
   setWebSocketInstance(wss);
 
   wss.on("connection", (ws) => {
-    // console.log("Client connected");
+    console.log("Client connected");
 
     ws.on("close", () => {
-      // console.log("Client disconnected");
+      console.log("Client disconnected");
     });
   });
 };

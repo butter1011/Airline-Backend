@@ -6,7 +6,7 @@ const WebSocket = require("ws");
 const { getWebSocketInstance } = require("../utils/websocket");
 const { uploadFileToS3 } = require("../utils/awsUpload");
 const crypto = require("crypto");
-const { updateAirportReview } = require("./airportReviewController");
+// const { updateAirportReview } = require("./airportReviewController");
 
 ///
 /// Create a new airline review
@@ -83,6 +83,7 @@ const createAirlineReview = async (req, res) => {
             JSON.stringify({
               type: "airlineAirport",
               data: updatedAirlineAirports,
+              review: populatedReview,
             })
           );
         }
