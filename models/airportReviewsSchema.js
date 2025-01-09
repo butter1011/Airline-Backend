@@ -19,7 +19,7 @@ const airportReviewSchema = new mongoose.Schema({
   },
   classTravel: {
     type: String,
-    enum: ["Economy", "Business", "First", "Premium Economy", "First",],
+    enum: ["Economy", "Business", "First", "Premium Economy", "First"],
     required: true,
   },
 
