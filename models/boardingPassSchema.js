@@ -3,11 +3,21 @@ const mongoose = require("mongoose");
 const boardingPassSchema = new mongoose.Schema(
   {
     name: {
-      type:String,
+      type: String,
       required: true,
     },
 
     departureAirportCode: {
+      type: String,
+      required: true,
+    },
+
+    departureAirportName: {
+      type: String,
+      required: true,
+    },
+
+    departureCountryCode: {
       type: String,
       required: true,
     },
@@ -18,6 +28,16 @@ const boardingPassSchema = new mongoose.Schema(
     },
 
     arrivalAirportCode: {
+      type: String,
+      required: true,
+    },
+
+    arrivalAirportName: {
+      type: String,
+      required: true,
+    },
+
+    arrivalCountryCode: {
       type: String,
       required: true,
     },
@@ -46,6 +66,7 @@ const boardingPassSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
     isFlightReviewed: {
       type: Boolean,
       required: true,
