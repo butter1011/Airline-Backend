@@ -6,7 +6,7 @@ const boardingPassSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    
+
     airlineName: {
       type: String,
       required: true,
@@ -17,7 +17,7 @@ const boardingPassSchema = new mongoose.Schema(
       required: true,
     },
 
-    departureAirportName: {
+    departureCity: {
       type: String,
       required: true,
     },
@@ -37,7 +37,7 @@ const boardingPassSchema = new mongoose.Schema(
       required: true,
     },
 
-    arrivalAirportName: {
+    arrivalCity: {
       type: String,
       required: true,
     },

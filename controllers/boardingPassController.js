@@ -1,17 +1,16 @@
 const BoardingPass = require("../models/boardingPassSchema");
 
 const createBoardingPass = async (req, res) => {
-
   try {
     const {
       name,
       airlineName,
       departureAirportCode,
-      departureAirportName,
+      departureCity,
       departureCountryCode,
       departureTime,
       arrivalAirportCode,
-      arrivalAirportName,
+      arrivalCity,
       arrivalCountryCode,
       arrivalTime,
       classOfTravel,
@@ -27,11 +26,11 @@ const createBoardingPass = async (req, res) => {
       name,
       airlineName,
       departureAirportCode,
-      departureAirportName,
+      departureCity,
       departureCountryCode,
       departureTime,
       arrivalAirportCode,
-      arrivalAirportName,
+      arrivalCity,
       arrivalCountryCode,
       arrivalTime,
       classOfTravel,
@@ -56,7 +55,6 @@ const createBoardingPass = async (req, res) => {
 };
 
 const getBoardingPass = async (req, res) => {
-
   try {
     const { name } = req.query;
     let boardingPasses;
@@ -82,11 +80,11 @@ const updateBoardingPass = async (req, res) => {
       name,
       airlineName,
       departureAirportCode,
-      departureAirportName,
+      departureCity,
       departureCountryCode,
       departureTime,
       arrivalAirportCode,
-      arrivalAirportName,
+      arrivalCity,
       arrivalCountryCode,
       arrivalTime,
       classOfTravel,
@@ -104,11 +102,11 @@ const updateBoardingPass = async (req, res) => {
         name,
         airlineName,
         departureAirportCode,
-        departureAirportName,
+        departureCity,
         departureCountryCode,
         departureTime,
         arrivalAirportCode,
-        arrivalAirportName,
+        arrivalCity,
         arrivalCountryCode,
         arrivalTime,
         classOfTravel,
