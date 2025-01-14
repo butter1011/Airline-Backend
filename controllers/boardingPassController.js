@@ -5,6 +5,7 @@ const createBoardingPass = async (req, res) => {
   try {
     const {
       name,
+      airlineName,
       departureAirportCode,
       departureAirportName,
       departureCountryCode,
@@ -24,6 +25,7 @@ const createBoardingPass = async (req, res) => {
 
     const newBoardingPass = new BoardingPass({
       name,
+      airlineName,
       departureAirportCode,
       departureAirportName,
       departureCountryCode,
@@ -78,6 +80,7 @@ const updateBoardingPass = async (req, res) => {
     const {
       _id,
       name,
+      airlineName,
       departureAirportCode,
       departureAirportName,
       departureCountryCode,
@@ -99,6 +102,7 @@ const updateBoardingPass = async (req, res) => {
       _id,
       {
         name,
+        airlineName,
         departureAirportCode,
         departureAirportName,
         departureCountryCode,
