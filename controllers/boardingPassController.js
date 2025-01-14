@@ -140,7 +140,7 @@ const updateBoardingPass = async (req, res) => {
 
 const checkPnrExists = async (req) => {
   try {
-    const pnr = req.query;
+    const { pnr } = req.query;
     const existingBoardingPass = await BoardingPass.findOne({ pnr: pnr });
     return !existingBoardingPass;
   } catch (error) {
