@@ -6,6 +6,11 @@ const boardingPassSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    
+    airlineName: {
+      type: String,
+      required: true,
+    },
 
     departureAirportCode: {
       type: String,
