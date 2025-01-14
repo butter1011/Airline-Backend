@@ -138,18 +138,16 @@ const updateBoardingPass = async (req, res) => {
   }
 };
 
-const checkPnrExists = async (req) => {
+const checkPnrExists = async (req, res) => {
   try {
-    const pnr = req.query;
+    const { pnr } = req.query; 
     const existingBoardingPass = await BoardingPass.findOne({ pnr: pnr });
-    return !existingBoardingPass;
+    res.status(200).json({ exists: !!existingBoardingPass });
   } catch (error) {
     console.error("Error checking PNR:", error);
-    return false;
+    res.status(500).json({ message: "Internal server error" });
   }
 };
-
-
 
 module.exports = {
   createBoardingPass,
