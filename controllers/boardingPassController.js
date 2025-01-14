@@ -140,7 +140,7 @@ const updateBoardingPass = async (req, res) => {
 
 const checkPnrExists = async (req, res) => {
   try {
-    const { pnr } = req.query; 
+    const { pnr } = req.query;
     const existingBoardingPass = await BoardingPass.findOne({ pnr: pnr });
     res.status(200).json({ exists: !!existingBoardingPass });
   } catch (error) {
