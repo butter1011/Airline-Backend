@@ -4,6 +4,7 @@ const createBoardingPass = async (req, res) => {
   try {
     const {
       name,
+      pnr,
       airlineName,
       departureAirportCode,
       departureCity,
@@ -24,6 +25,7 @@ const createBoardingPass = async (req, res) => {
 
     const newBoardingPass = new BoardingPass({
       name,
+      pnr,
       airlineName,
       departureAirportCode,
       departureCity,
@@ -78,6 +80,7 @@ const updateBoardingPass = async (req, res) => {
     const {
       _id,
       name,
+      pnr,
       airlineName,
       departureAirportCode,
       departureCity,
@@ -100,6 +103,7 @@ const updateBoardingPass = async (req, res) => {
       _id,
       {
         name,
+        pnr,
         airlineName,
         departureAirportCode,
         departureCity,
@@ -134,8 +138,19 @@ const updateBoardingPass = async (req, res) => {
   }
 };
 
+const checkPnrExists = async (pnr) => {
+  try {
+    const existingBoardingPass = await BoardingPass.findOne({ pnr: pnr });
+    return !existingBoardingPass;
+  } catch (error) {
+    console.error("Error checking PNR:", error);
+    return false;
+  }
+};
+
 module.exports = {
   createBoardingPass,
   getBoardingPass,
   updateBoardingPass,
+  checkPnrExists,
 };
