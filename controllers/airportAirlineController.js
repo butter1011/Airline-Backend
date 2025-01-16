@@ -1,5 +1,6 @@
 /// Create the Airline and Airport api
 /// Check if the airline/airport already exists
+const axios = require("axios");
 const AirlineAirport = require("../models/airlinePortListsSchema");
 
 ///
@@ -198,10 +199,113 @@ const getAirlineAirportLists = async (req, res) => {
   }
 };
 
+const createAirlineByCirium = async (req, res) => {
+  try { 
+    const airlineDataByCirium = await axios.get(
+      "https://api.flightstats.com/flex/airlines/rest/v1/json/active",
+      {
+        params: {
+          appId: process.env.CIRIUM_APP_ID,
+          appKey: process.env.CIRIUM_APP_KEY,
+        },
+      }
+    );
+    const promises = airlineDataByCirium.data.airlines.map(async (airline) => {
+      if (!airline.iata) return;
+
+      const existingAirline = await AirlineAirport.findOne({
+        name: airline.name,
+      });
+
+      if (!existingAirline) {
+        const newAirline = new AirlineAirport({
+          name: airline.name,
+          isAirline: false,
+          iataCode: airline.iata,
+          perksBio:
+            "Enjoy exclusive perks with us, including priority boarding, complimentary meals, and lounge access. Our frequent flyer program rewards your loyalty with upgrades and discounts. Travel better with our thoughtful amenities!",
+          trendingBio:
+            "Join the travelers who love flying with us! We offer in-flight Wi-Fi, personalized meals, and seamless connections. Stay tuned for our latest promotions and make the most of your journey!",
+          descriptionBio:
+            "We provide a top-notch flying experience with a modern fleet and friendly service. Enjoy comfortable seating and support from booking to landing. Travel with us for a smooth and enjoyable journey!",
+        });
+        return await newAirline.save();
+      }
+    });
+
+    await Promise.all(promises);
+
+    res.status(200).json({
+      success: true,
+      message: "Airlines created successfully",
+    });
+  } catch (error) {
+    console.error("Error creating airlines:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error creating airlines",
+      error: error.message,
+    });
+  }
+};
+
+const createAirportByCirium = async (req, res) => {
+  try {
+    const airportDataByCirium = await axios.get(
+      "https://api.flightstats.com/flex/airports/rest/v1/json/active",
+      {
+        params: {
+          appId: process.env.CIRIUM_APP_ID,
+          appKey: process.env.CIRIUM_APP_KEY,
+        },
+      }
+    );
+
+    const promises = airportDataByCirium.data.airports.map(async (airport) => {
+      if (!airport.iata) return;
+
+      const existingAirport = await AirlineAirport.findOne({
+        name: airport.name,
+      });
+
+      if (!existingAirport) {
+        const newAirport = new AirlineAirport({
+          name: airport.name,
+          isAirline: true,
+          iataCode: airport.iata,
+          perksBio:
+            "Enjoy great perks like free meals, lounge access, and miles on every flight. Travel better with us!",
+          trendingBio:
+            "Fly smarter! Get first-class upgrades, free Wi-Fi, and compensation for delays. Join the trend today!",
+          descriptionBio:
+            "Welcome aboard! We focus on your comfort and safety with friendly service and modern planes. Let’s make your journey memorable!",
+          countryCode: airport.countryCode,
+          });
+        return await newAirport.save();
+      }
+    });
+
+    await Promise.all(promises);
+
+    res.status(200).json({
+      success: true,
+      message: "Airlines created successfully",
+    });
+  } catch (error) {
+    console.error("Error creating airlines:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error creating airlines",
+      error: error.message,
+    });
+  }
+};
 module.exports = {
   createAirlineAirport,
   getAirlineAirport,
   updateAirlineAirport,
   initializeClassCounts,
   getAirlineAirportLists,
+  createAirlineByCirium,
+  createAirportByCirium,
 };

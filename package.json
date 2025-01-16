@@ -12,7 +12,7 @@
   "description": "",
   "dependencies": {
     "aws-sdk": "^2.1692.0",
-    "axios": "^1.7.7",
+    "axios": "^1.7.9",
     "cors": "^2.8.5",
     "countries-and-timezones": "^3.7.2",
     "countries-list": "^3.1.1",
