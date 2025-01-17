@@ -220,7 +220,7 @@ const createAirlineByCirium = async (req, res) => {
       if (!existingAirline) {
         const newAirline = new AirlineAirport({
           name: airline.name,
-          isAirline: false,
+          isAirline: true,
           iataCode: airline.iata,
           perksBio:
             "Enjoy exclusive perks with us, including priority boarding, complimentary meals, and lounge access. Our frequent flyer program rewards your loyalty with upgrades and discounts. Travel better with our thoughtful amenities!",
@@ -271,7 +271,7 @@ const createAirportByCirium = async (req, res) => {
       if (!existingAirport) {
         const newAirport = new AirlineAirport({
           name: airport.name,
-          isAirline: true,
+          isAirline: false,
           iataCode: airport.iata,
           perksBio:
             "Enjoy great perks like free meals, lounge access, and miles on every flight. Travel better with us!",
