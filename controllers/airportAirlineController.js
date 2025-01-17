@@ -273,6 +273,7 @@ const createAirportByCirium = async (req, res) => {
           name: airport.name,
           isAirline: false,
           iataCode: airport.iata,
+          city: airport.city,
           perksBio:
             "Enjoy great perks like free meals, lounge access, and miles on every flight. Travel better with us!",
           trendingBio:

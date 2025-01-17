@@ -97,6 +97,11 @@ const airlineAirportSchema = new mongoose.Schema({
     required: false,
   },
 
+  city: {
+    type: String,
+    required: false,
+  },
+
   scoreHistory: [
     {
       score: {
