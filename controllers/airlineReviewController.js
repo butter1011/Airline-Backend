@@ -60,12 +60,12 @@ const createAirlineReview = async (req, res) => {
       })
       .populate({
         path: "from",
-        select: "name _id",
+        select: "name _id city",
         model: AirlineAirport,
       })
       .populate({
         path: "to",
-        select: "name _id",
+        select: "name _id city",
         model: AirlineAirport,
       });
 
@@ -139,12 +139,12 @@ const updateAirlineReview = async (req, res) => {
       })
       .populate({
         path: "from",
-        select: "name _id",
+        select: "name _id city",
         model: AirlineAirport,
       })
       .populate({
         path: "to",
-        select: "name _id",
+        select: "name _id city",
         model: AirlineAirport,
       });
 
@@ -162,10 +162,12 @@ const updateAirlineReview = async (req, res) => {
       from: {
         name: updatedReview.from.name,
         _id: updatedReview.from._id,
+        city: updatedReview.from.city,
       },
       to: {
         name: updatedReview.to.name,
         _id: updatedReview.to._id,
+        city: updatedReview.to.city,
       },
       airline: {
         name: updatedReview.airline.name,
