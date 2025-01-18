@@ -70,11 +70,14 @@ const calculateAirlineScores = async (airlineReview) => {
     await airlineScore.save();
   }
 
+  console.log("=============😍");
   const airlineAirport = await AirlineAirport.findById(
     airlineReview.airline.toString()
   );
 
   if (airlineAirport) {
+    console.log("============🤣");
+    console.log("Airline Airport:", airlineAirport);
     airlineAirport.totalReviews += 1;
     const classType = airlineReview.classTravel.toLowerCase();
 
@@ -108,10 +111,10 @@ const calculateAirlineScores = async (airlineReview) => {
     const previousOverallScore = airlineAirport.overall || 0;
     airlineAirport.overall = updateOverallScore(airlineAirport, compositeScore);
 
-    // Save score history
-    if (!airlineAirport.scoreHistory) {
-      airlineAirport.scoreHistory = [];
-    }
+    // // Save score history
+    // if (!airlineAirport.scoreHistory) {
+    //   airlineAirport.scoreHistory = [];
+    // }
     
     airlineAirport.scoreHistory.push({
       score: airlineAirport.overall,

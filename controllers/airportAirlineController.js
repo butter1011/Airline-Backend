@@ -172,6 +172,43 @@ const updateAirlineAirport = async (req, res) => {
 };
 
 ///
+/// Uodate the ScoreHistory api
+const updateScoreHistory = async (req, res) => {
+  try {
+    console.log("---------------------------");
+    
+    const { id, score } = req.body;
+
+    const updatedAirlineAirport = await AirlineAirport.findByIdAndUpdate(
+      id,
+      {
+        $push: { scoreHistory: score }
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedAirlineAirport) {
+      return res.status(404).json({
+        success: false,
+        message: "Airline/Airport not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: updatedAirlineAirport,
+      message: "Score history updated successfully",
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Error updating score history",
+      error: error.message,
+    });
+  }
+};
+
+///
 /// Get the Airline and Airport api
 const getAirlineAirportLists = async (req, res) => {
   try {
@@ -309,4 +346,5 @@ module.exports = {
   getAirlineAirportLists,
   createAirlineByCirium,
   createAirportByCirium,
+  updateScoreHistory,
 };
