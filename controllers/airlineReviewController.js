@@ -42,6 +42,9 @@ const createAirlineReview = async (req, res) => {
       comment,
     });
 
+    // Generate a unique ID for the review
+    console.log("newAirlineReview:", newAirlineReview);
+
     const compositeScore = await calculateAirlineScores(newAirlineReview);
     newAirlineReview.score = compositeScore;
 
@@ -249,7 +252,6 @@ const uploadAirlineMedia = async (req, res) => {
   }
 };
 
-
 ///
 /// Get all airline reviews
 const getAirlineReviews = async (req, res) => {
@@ -286,12 +288,12 @@ const getAirlineReviews = async (req, res) => {
       from: {
         name: review.from.name,
         _id: review.from._id,
-        city:review.from.city,
+        city: review.from.city,
       },
       to: {
         name: review.to.name,
         _id: review.to._id,
-        city:review.to.city,
+        city: review.to.city,
       },
       airline: {
         name: review.airline.name,

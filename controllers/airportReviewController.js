@@ -166,6 +166,7 @@ const updateAirportReview = async (req, res) => {
 };
 const getAirportReviews = async (req, res) => {
   try {
+    console.log("Getting airport reviews", req.query);
     const reviews = await AirportReview.find()
       .populate({
         path: "reviewer",
@@ -210,7 +211,7 @@ const getAirportReviews = async (req, res) => {
       rating: review.rating,
       images: review.images,
       videos: review.videos,
-      countryCode: review.airport.countryCode, 
+      countryCode: review.airport.countryCode,
       score: review.score,
     }));
 
@@ -251,7 +252,9 @@ const uploadAirportMedia = async (req, res) => {
       url
     );
 
-    const review = await AirlineReview.findById(reviewId);
+    console.log("ReviewId:", reviewId);
+    const review = await AirportReview.findById(reviewId);
+    console.log("Review--------------------------->:", review);
     if (!review) {
       return res
         .status(404)
