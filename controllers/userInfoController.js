@@ -1,11 +1,11 @@
 const UserInfo = require("../models/userInfoSchema");
 const { uploadFileToS3 } = require("../utils/awsUpload");
 const createUserInfo = async (req, res) => {
-  let { name, whatsappNumber, email } = req.body;
+  let { name, whatsappNumber, email, apple } = req.body;
 
   let existingUser = null;
 
-  if (!email && !whatsappNumber) {
+  if (!email && !whatsappNumber &&!apple) {
     return res.status(400).json({
       success: false,
       message: "Either email or WhatsApp number is required",
@@ -21,6 +21,11 @@ const createUserInfo = async (req, res) => {
         whatsappNumber: whatsappNumber,
       });
     }
+    else if(apple){
+      existingUser = await UserInfo.findOne({
+        apple: apple,
+      });
+    }
 
     if (existingUser) {
       return res.json({ userData: existingUser, userState: 1 });
@@ -31,6 +36,7 @@ const createUserInfo = async (req, res) => {
       name: name,
       email: email,
       whatsappNumber: whatsappNumber,
+      apple:apple,
     });
     await newUser.save();
 
