@@ -13,7 +13,11 @@ const userInfoSchema = new mongoose.Schema(
       required: false,
       unique: true,
     },
-
+    apple: {
+      type: String,
+      required: false,
+      unique: true,
+    },
     flyertype: {
       type: String,
       required: false,
