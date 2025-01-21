@@ -10,7 +10,7 @@ const uploadFileToS3 = async (fileBuffer, fileName) => {
   const key = `${fileName}`;
 
   const uploadParams = {
-    Bucket: "airlinereview",
+    Bucket: "airsharereview", //airsharereview
     Key: key,
     Body: fileBuffer,
     ACL: "public-read",
