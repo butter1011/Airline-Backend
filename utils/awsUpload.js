@@ -23,11 +23,12 @@ const uploadFileToS3 = async (fileBuffer, fileName) => {
         reject(err);
       }
       if (data) {
-        console.log("Uploaded in", data.Location);
-        resolve(data.Location);
+        const cloudfrontUrl = `${process.env.CLOUDFRONT_URL}/${key}`;
+        console.log("Uploaded in", cloudfrontUrl);
+        resolve(cloudfrontUrl);
       }
     });
   });
-};
 
+};
 module.exports = { uploadFileToS3 };
