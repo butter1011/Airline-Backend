@@ -106,19 +106,23 @@ const createAirlineReview = async (req, res) => {
 ///
 /// Update an existing airline review
 const updateAirlineReview = async (req, res) => {
+  console.log("req.body:", req.body);
   try {
-    const { feedbackId, user_id, reactionType } = req.body;
+    const { feedbackId, user_id, isFavorite } = req.body;
 
     const existingReview = await AirlineReview.findById(feedbackId);
     if (!existingReview) {
       return res.status(404).json({ message: "Review not found" });
     }
 
-    let updatedRating = existingReview.rating || {};
-    if (!updatedRating.hasOwnProperty(user_id)) {
-      updatedRating[user_id] = reactionType;
+    let updatedRating = [...(existingReview.rating || [])];
+    if (isFavorite) {
+      console.log("user_id:", user_id,);
+      if (!updatedRating.includes(user_id)) {
+        updatedRating.push(user_id);
+      }
     } else {
-      updatedRating[user_id] = reactionType;
+      updatedRating = updatedRating.filter(id => id !== user_id);
     }
 
     const updatedReview = await AirlineReview.findByIdAndUpdate(
@@ -191,7 +195,6 @@ const updateAirlineReview = async (req, res) => {
     res.status(500).json({ success: false });
   }
 };
-
 ///
 /// upload the media to the s3 bucket
 const uploadAirlineMedia = async (req, res) => {

@@ -79,7 +79,9 @@ const createAirlineAirport = async (req, res) => {
 /// Get the Airline and Airport api
 const getAirlineAirport = async (req, res) => {
   try {
-    const airlineAirports = await AirlineAirport.find().sort({ overall: -1 });
+    console.log("---------------------------");
+    const airlineAirports = await AirlineAirport.find();
+    console.log("--------------------✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨-------412341", airlineAirports);
 
     res.status(200).json({
       message: "Airline/Airport data retrieved successfully",
@@ -176,13 +178,13 @@ const updateAirlineAirport = async (req, res) => {
 const updateScoreHistory = async (req, res) => {
   try {
     console.log("---------------------------");
-    
+
     const { id, score } = req.body;
 
     const updatedAirlineAirport = await AirlineAirport.findByIdAndUpdate(
       id,
       {
-        $push: { scoreHistory: score }
+        $push: { scoreHistory: score },
       },
       { new: true, runValidators: true }
     );
@@ -237,7 +239,7 @@ const getAirlineAirportLists = async (req, res) => {
 };
 
 const createAirlineByCirium = async (req, res) => {
-  try { 
+  try {
     const airlineDataByCirium = await axios.get(
       "https://api.flightstats.com/flex/airlines/rest/v1/json/active",
       {
@@ -318,7 +320,7 @@ const createAirportByCirium = async (req, res) => {
           descriptionBio:
             "Welcome aboard! We focus on your comfort and safety with friendly service and modern planes. Let’s make your journey memorable!",
           countryCode: airport.countryCode,
-          });
+        });
         return await newAirport.save();
       }
     });

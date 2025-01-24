@@ -90,19 +90,21 @@ const createAirportReview = async (req, res) => {
 };
 const updateAirportReview = async (req, res) => {
   try {
-    const { feedbackId, user_id, reactionType } = req.body;
+    const { feedbackId, user_id, isFavorite } = req.body;
 
     const existingReview = await AirportReview.findById(feedbackId);
     if (!existingReview) {
       return res.status(404).json({ message: "Review not found" });
     }
 
-    let updatedRating = existingReview.rating || {};
-
-    if (!updatedRating.hasOwnProperty(user_id)) {
-      updatedRating[user_id] = reactionType;
+    let updatedRating = [...(existingReview.rating || [])];
+    if (isFavorite) {
+      console.log("user_id:", user_id);
+      if (!updatedRating.includes(user_id)) {
+        updatedRating.push(user_id);
+      }
     } else {
-      updatedRating[user_id] = reactionType;
+      updatedRating = updatedRating.filter((id) => id !== user_id);
     }
 
     const updatedReview = await AirportReview.findByIdAndUpdate(

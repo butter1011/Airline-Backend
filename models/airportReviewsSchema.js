@@ -64,9 +64,9 @@ const airportReviewSchema = new mongoose.Schema({
   },
 
   rating: {
-    type: Object,
+    type: [String],
     required: false,
-    default: {},
+    default: [],
   },
 
   images: {
