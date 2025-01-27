@@ -220,10 +220,6 @@ const uploadAirlineMedia = async (req, res) => {
       }/${crypto.randomUUID()}.${fileType}`
     );
 
-    console.log(
-      `${mediaType.charAt(0).toUpperCase() + mediaType.slice(1)} URL:`,
-      url
-    );
 
     const review = await AirlineReview.findById(reviewId);
     if (!review) {

@@ -79,9 +79,9 @@ const createAirlineAirport = async (req, res) => {
 /// Get the Airline and Airport api
 const getAirlineAirport = async (req, res) => {
   try {
-    console.log("---------------------------");
-    const airlineAirports = await AirlineAirport.find();
-    console.log("--------------------✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨-------412341", airlineAirports);
+    const airlineAirports = await AirlineAirport.find().sort({
+      overall: -1,
+    });
 
     res.status(200).json({
       message: "Airline/Airport data retrieved successfully",
