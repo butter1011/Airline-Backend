@@ -5,7 +5,6 @@ const UserInfo = require("../models/userInfoSchema");
 const { calculateAirportScores } = require("./calculatorController");
 const WebSocket = require("ws");
 const { getWebSocketInstance } = require("../utils/websocket");
-const { uploadFileToS3 } = require("../utils/awsUpload");
 const crypto = require("crypto");
 
 ///
@@ -24,6 +23,7 @@ const createAirportReview = async (req, res) => {
       foodBeverage,
       amenities,
       comment,
+      imageUrls,
     } = req.body;
 
     const newAirportReview = new AirportReview({
@@ -38,6 +38,7 @@ const createAirportReview = async (req, res) => {
       foodBeverage,
       amenities,
       comment,
+      imageUrls,
     });
 
     let compositeScore = await calculateAirportScores(newAirportReview);
@@ -99,7 +100,6 @@ const updateAirportReview = async (req, res) => {
 
     let updatedRating = [...(existingReview.rating || [])];
     if (isFavorite) {
-      console.log("user_id:", user_id);
       if (!updatedRating.includes(user_id)) {
         updatedRating.push(user_id);
       }
@@ -131,7 +131,6 @@ const updateAirportReview = async (req, res) => {
         select: "name _id",
         model: AirlineAirport,
       });
-    console.log("updatedReview", updatedReview);
     if (!updatedReview) {
       return res.status(404).json({ message: "Review not found after update" });
     }
@@ -156,7 +155,6 @@ const updateAirportReview = async (req, res) => {
       date: updatedReview.date,
       rating: updatedReview.rating,
     };
-    console.log("Formatted Reviews:", formattedReviews);
     res.status(200).json({
       success: true,
       data: formattedReviews,
@@ -168,7 +166,6 @@ const updateAirportReview = async (req, res) => {
 };
 const getAirportReviews = async (req, res) => {
   try {
-    console.log("Getting airport reviews", req.query);
     const reviews = await AirportReview.find()
       .populate({
         path: "reviewer",
@@ -211,8 +208,7 @@ const getAirportReviews = async (req, res) => {
       comment: review.comment,
       date: review.date,
       rating: review.rating,
-      images: review.images,
-      videos: review.videos,
+      imageUrls: review.imageUrls,
       countryCode: review.airport.countryCode,
       score: review.score,
     }));
@@ -229,66 +225,8 @@ const getAirportReviews = async (req, res) => {
     });
   }
 };
-
-///
-/// Upload the media to the S3 bucket
-const uploadAirportMedia = async (req, res) => {
-  console.log("Received request to upload media", req.body);
-  if (!req.file) {
-    return res.status(400).send("No file uploaded.");
-  }
-
-  try {
-    const file = req.file;
-    const reviewId = req.body.id;
-    const mediaType = req.body.type; // 'image' or 'video'
-
-    const fileType = file.originalname.split(".")[1].toLowerCase();
-    const url = await uploadFileToS3(
-      file.buffer,
-      `review/airport/${crypto.randomUUID()}.${fileType}`
-    );
-
-    console.log(
-      `${mediaType.charAt(0).toUpperCase() + mediaType.slice(1)} URL:`,
-      url
-    );
-
-    console.log("ReviewId:", reviewId);
-    const review = await AirportReview.findById(reviewId);
-    console.log("Review--------------------------->:", review);
-    if (!review) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Review not found" });
-    }
-
-    if (mediaType === "image") {
-      if (!review.images) {
-        review.images = [];
-      }
-      review.images.push(url);
-    } else {
-      if (!review.videos) {
-        review.videos = [];
-      }
-      review.videos.push(url);
-    }
-
-    const updateReview = await review.save();
-
-    res.json({ data: updateReview, success: true });
-  } catch (error) {
-    console.error(`Error uploading ${req.body.type}:`, error);
-    res
-      .status(500)
-      .json({ success: false, error: `${req.body.type} upload failed` });
-  }
-};
-
 module.exports = {
   createAirportReview,
   updateAirportReview,
   getAirportReviews,
-  uploadAirportMedia,
 };

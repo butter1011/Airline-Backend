@@ -69,15 +69,11 @@ const calculateAirlineScores = async (airlineReview) => {
     });
     await airlineScore.save();
   }
-
-  console.log("=============😍");
   const airlineAirport = await AirlineAirport.findById(
     airlineReview.airline.toString()
   );
 
   if (airlineAirport) {
-    console.log("============🤣");
-    console.log("Airline Airport:", airlineAirport);
     airlineAirport.totalReviews += 1;
     const classType = airlineReview.classTravel.toLowerCase();
 

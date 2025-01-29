@@ -4,7 +4,6 @@ const UserInfo = require("../models/userInfoSchema");
 const { calculateAirlineScores } = require("./calculatorController");
 const WebSocket = require("ws");
 const { getWebSocketInstance } = require("../utils/websocket");
-const { uploadFileToS3 } = require("../utils/awsUpload");
 const crypto = require("crypto");
 // const { updateAirportReview } = require("./airportReviewController");
 
@@ -25,6 +24,7 @@ const createAirlineReview = async (req, res) => {
       foodBeverage,
       entertainmentWifi,
       comment,
+      imageUrls,
     } = req.body;
 
     const newAirlineReview = new AirlineReview({
@@ -40,11 +40,10 @@ const createAirlineReview = async (req, res) => {
       foodBeverage,
       entertainmentWifi,
       comment,
+      imageUrls,
     });
 
     // Generate a unique ID for the review
-    console.log("newAirlineReview:", newAirlineReview);
-
     const compositeScore = await calculateAirlineScores(newAirlineReview);
     newAirlineReview.score = compositeScore;
 
@@ -106,7 +105,6 @@ const createAirlineReview = async (req, res) => {
 ///
 /// Update an existing airline review
 const updateAirlineReview = async (req, res) => {
-  console.log("req.body:", req.body);
   try {
     const { feedbackId, user_id, isFavorite } = req.body;
 
@@ -117,7 +115,6 @@ const updateAirlineReview = async (req, res) => {
 
     let updatedRating = [...(existingReview.rating || [])];
     if (isFavorite) {
-      console.log("user_id:", user_id,);
       if (!updatedRating.includes(user_id)) {
         updatedRating.push(user_id);
       }
@@ -185,7 +182,6 @@ const updateAirlineReview = async (req, res) => {
       date: updatedReview.date,
       rating: updatedReview.rating,
     };
-    console.log("Formatted Reviews:", formattedReviews);
     res.status(200).json({
       success: true,
       data: formattedReviews,
@@ -193,61 +189,6 @@ const updateAirlineReview = async (req, res) => {
   } catch (error) {
     console.error("Error updating airline review:", error);
     res.status(500).json({ success: false });
-  }
-};
-///
-/// upload the media to the s3 bucket
-const uploadAirlineMedia = async (req, res) => {
-  console.log("Received request to upload media", req.body);
-  if (!req.file) {
-    return res.status(400).send("No file uploaded.");
-  }
-
-  try {
-    const file = req.file;
-    const reviewId = req.body.id;
-    const mediaType = req.body.type; // 'image' or 'video'
-
-    const fileType = file.originalname.split(".")[1].toLowerCase();
-    const url = await uploadFileToS3(
-      file.buffer,
-      `review/${
-        mediaType === "image"
-          ? "airline"
-          : mediaType === "video"
-          ? "airline"
-          : "airport"
-      }/${crypto.randomUUID()}.${fileType}`
-    );
-
-
-    const review = await AirlineReview.findById(reviewId);
-    if (!review) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Review not found" });
-    }
-
-    if (mediaType === "image") {
-      if (!review.images) {
-        review.images = [];
-      }
-      review.images.push(url);
-    } else {
-      if (!review.videos) {
-        review.videos = [];
-      }
-      review.videos.push(url);
-    }
-
-    const updateReview = await review.save();
-
-    res.json({ data: updateReview, success: true });
-  } catch (error) {
-    console.error(`Error uploading ${req.body.type}:`, error);
-    res
-      .status(500)
-      .json({ success: false, error: `${req.body.type} upload failed` });
   }
 };
 
@@ -305,8 +246,7 @@ const getAirlineReviews = async (req, res) => {
       comment: review.comment,
       date: review.date,
       rating: review.rating,
-      images: review.images,
-      videos: review.videos,
+      imageUrls: review.imageUrls,
       countryCode: review.airline.countryCode,
       score: review.score,
     }));
@@ -325,6 +265,5 @@ const getAirlineReviews = async (req, res) => {
 module.exports = {
   createAirlineReview,
   getAirlineReviews,
-  uploadAirlineMedia,
   updateAirlineReview,
 };

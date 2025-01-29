@@ -77,13 +77,7 @@ const airlineReviewSchema = new mongoose.Schema({
     default: [],
   },
 
-  images: {
-    type: [String],
-    required: false,
-    default: [],
-  },
-
-  videos: {
+  imageUrls: {
     type: [String],
     required: false,
     default: [],

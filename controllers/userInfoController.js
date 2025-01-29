@@ -1,5 +1,4 @@
 const UserInfo = require("../models/userInfoSchema");
-const { uploadFileToS3 } = require("../utils/awsUpload");
 const createUserInfo = async (req, res) => {
   let { name, whatsappNumber, email, apple } = req.body;
 
@@ -50,7 +49,7 @@ const createUserInfo = async (req, res) => {
 ///
 /// Edit user
 const editUserInfo = async (req, res) => {
-  let { name, bio, _id, favoriteAirline } = req.body;
+  let { name, bio, _id, favoriteAirline, profilePhoto } = req.body;
   let editingUser = null;
 
   try {
@@ -59,6 +58,7 @@ const editUserInfo = async (req, res) => {
     // Create new user if doesn't exist
     editingUser.name = name;
     editingUser.bio = bio;
+    editingUser.profilePhoto = profilePhoto;
     if (favoriteAirline) {
       editingUser.favoriteAirlines = favoriteAirline;
     }
@@ -90,43 +90,12 @@ const badgeEditUserInfo = async (req, res) => {
   }
 };
 
-const uploadUserAvatar = async (req, res) => {
-  if (!req.file) {
-    return res.status(400).send("No file uploaded.");
-  }
-
-  try {
-    const file = req.file;
-    const userId = req.body.userId;
-
-    const fileType = file.originalname.split(".")[1].toLowerCase();
-    const url = await uploadFileToS3(
-      file.buffer,
-      `avatar/${userId}.${fileType}`
-    );
-
-    const user = await UserInfo.findById(userId);
-    if (!user) {
-      return res.status(404).json({ success: false, error: "User not found" });
-    }
-
-    user.profilePhoto = url;
-    await user.save();
-
-    res.json({ userData: user, userState: 1 });
-  } catch (error) {
-    console.error("Error uploading file:", error);
-    res.status(500).json({ success: false, error: "File upload failed" });
-  }
-};
-
 const increaseUserPoints = async (req, res) => {
   const { _id, pointsToAdd } = req.body;
 
   try {
     const user = await UserInfo.findById(_id);
     if (!user) {
-      console.log("User not found");
       return res.status(404).json({ success: false, error: "User not found" });
     }
 
@@ -155,6 +124,5 @@ module.exports = {
   createUserInfo,
   editUserInfo,
   badgeEditUserInfo,
-  uploadUserAvatar,
   increaseUserPoints,
 };
