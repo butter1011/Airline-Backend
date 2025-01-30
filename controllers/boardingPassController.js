@@ -74,6 +74,7 @@ const getBoardingPass = async (req, res) => {
 };
 
 const updateBoardingPass = async (req, res) => {
+  console.log("updateBoardingPass", req.body);
   try {
     const {
       _id,
