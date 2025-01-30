@@ -18,9 +18,8 @@ const createBoardingPass = async (req, res) => {
       airlineCode,
       flightNumber,
       visitStatus,
-      isFlightReviewed,
-      isDepartureAirportReviewed,
-      isArrivalAirportReviewed,
+      isReviewed,
+
     } = req.body;
 
     const newBoardingPass = new BoardingPass({
@@ -39,9 +38,8 @@ const createBoardingPass = async (req, res) => {
       airlineCode,
       flightNumber,
       visitStatus,
-      isFlightReviewed,
-      isDepartureAirportReviewed,
-      isArrivalAirportReviewed,
+      isReviewed,
+    
     });
 
     const savedBoardingPass = await newBoardingPass.save();
@@ -94,9 +92,8 @@ const updateBoardingPass = async (req, res) => {
       airlineCode,
       flightNumber,
       visitStatus,
-      isFlightReviewed,
-      isDepartureAirportReviewed,
-      isArrivalAirportReviewed,
+      isReviewed,
+ 
     } = req.body;
 
     const updatedBoardingPass = await BoardingPass.findByIdAndUpdate(
@@ -117,9 +114,7 @@ const updateBoardingPass = async (req, res) => {
         airlineCode,
         flightNumber,
         visitStatus,
-        isFlightReviewed,
-        isDepartureAirportReviewed,
-        isArrivalAirportReviewed,
+        isReviewed,     
       },
       { new: true }
     );

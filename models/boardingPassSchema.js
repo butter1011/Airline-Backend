@@ -77,20 +77,10 @@ const boardingPassSchema = new mongoose.Schema(
       required: true,
     },
 
-    isFlightReviewed: {
+    isReviewed: {
       type: Boolean,
       required: true,
-    },
-
-    isDepartureAirportReviewed: {
-      type: Boolean,
-      required: true,
-    },
-
-    isArrivalAirportReviewed: {
-      type: Boolean,
-      required: true,
-    },
+    },  
   },
   {
     timestamps: true,
