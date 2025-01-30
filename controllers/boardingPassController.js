@@ -73,7 +73,7 @@ const getBoardingPass = async (req, res) => {
   }
 };
 
-const updateBoardingPass = async (req, res) => {
+const updateBoardingPass = async (req, res) => { 
   try {
     const {
       _id,
