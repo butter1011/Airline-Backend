@@ -45,9 +45,7 @@ router.post("/api/v1/airport-review/update", updateAirportReview);
 // Postman API
 router.post("/api/v1/airline-airport/create", createAirlineAirport);
 router.post("/api/v1/airline-cirium/create", createAirlineByCirium);
-router.post("/api/v1/airport-cirium/create", createAirportByCirium);
 router.post("/api/v1/airline-airport/update", updateAirlineAirport);
-router.post("/api/v1/airline-airport/init", initializeClassCounts);
 router.post("/api/v1/airline-airport/init", initializeClassCounts);
 router.post("/api/v1/airline-airport/update-score", updateScoreHistory);
 
