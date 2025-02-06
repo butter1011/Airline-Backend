@@ -62,23 +62,23 @@ const createAirportReview = async (req, res) => {
         model: AirlineAirport,
       });
 
-    // Send WebSocket update
-    const updatedAirlineAirports = await AirlineAirport.find().sort({
-      overall: -1,
-    });
-    const wss = getWebSocketInstance();
+    // // Send WebSocket update
+    // const updatedAirlineAirports = await AirlineAirport.find().sort({
+    //   overall: -1,
+    // });
+    // const wss = getWebSocketInstance();
 
-    if (wss) {
-      wss.clients.forEach((client) => {
-        client.send(
-          JSON.stringify({
-            type: "airlineAirport",
-            data: updatedAirlineAirports,
-            review: populatedReview,
-          })
-        );
-      });
-    }
+    // if (wss) {
+    //   wss.clients.forEach((client) => {
+    //     client.send(
+    //       JSON.stringify({
+    //         type: "airlineAirport",
+    //         data: updatedAirlineAirports,
+    //         review: populatedReview,
+    //       })
+    //     );
+    //   });
+    // }
 
     res.status(201).json({
       message: "Airport review created successfully",
