@@ -71,28 +71,6 @@ const createAirlineReview = async (req, res) => {
         model: AirlineAirport,
       });
 
-    // Send WebSocket update
-    // const updatedAirlineAirports = await AirlineAirport.find().sort({
-    //   overall: -1,
-    // });
-
-    // const wss = getWebSocketInstance();
-
-    // if (wss) {
-    //   wss.clients.forEach((client) => {
-    //     if (client.readyState === WebSocket.OPEN) {
-    //       client.send(
-    //         JSON.stringify({
-    //           type: "airlineAirport",
-    //           data: updatedAirlineAirports,
-    //           review: populatedReview,
-    //         })
-    //       );
-    //     }  
-    //   });
-    // }
-    console.log("--------------------");
-
     res.status(201).json({
       message: "Airline review created successfully",
       data: populatedReview,

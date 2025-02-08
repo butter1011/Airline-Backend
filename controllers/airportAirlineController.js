@@ -348,30 +348,37 @@ const createAirportByCirium = async (req, res) => {
 
 const getFilteredAirlineLists = async (req, res) => {
   try {
-    const { airType, flyerClass, category, continents, page = 1 } = req.query;
+    const { airType, flyerClass, searchQuery, page = 1 } = req.query;
     const limit = 5;
     const skip = (page - 1) * limit;
 
     let query = {};
     let sort = { overall: -1 };
 
-    // Filter by airline/airport type
-    if (airType && airType.toLowerCase() !== "all") {
-      query.isAirline = airType.toLowerCase() === "airline";
-    }
+    // If searchQuery exists, search by name based on airType
+    if (searchQuery && searchQuery !== "") {
+      query = {
+        name: { $regex: searchQuery, $options: "i" },
+      };
+    } else {
+      // Original filtering logic when no search query exists
+      if (airType && airType.toLowerCase() !== "all") {
+        query.isAirline = airType.toLowerCase() === "airline";
+      }
 
-    // Apply class-specific sorting
-    if (flyerClass && flyerClass !== "All") {
-      switch (flyerClass) {
-        case "Business":
-          sort = { businessClass: -1 };
-          break;
-        case "Premium Economy":
-          sort = { pey: -1 };
-          break;
-        case "Economy":
-          sort = { economyClass: -1 };
-          break;
+      // Apply class-specific sorting
+      if (flyerClass && flyerClass !== "All") {
+        switch (flyerClass) {
+          case "Business":
+            sort = { businessClass: -1 };
+            break;
+          case "Premium Economy":
+            sort = { pey: -1 };
+            break;
+          case "Economy":
+            sort = { economyClass: -1 };
+            break;
+        }
       }
     }
 
@@ -401,71 +408,122 @@ const getFilteredAirlineLists = async (req, res) => {
 
 const getFilteredFeedLists = async (req, res) => {
   try {
-    const { airType, flyerClass, page = 1 } = req.query;
+    const { airType, flyerClass, page = 1, searchQuery = "" } = req.query;
     const limit = 5;
     const skip = (page - 1) * limit;
 
     let results = [];
-    if (airType.toLowerCase() === "airline") {
-      // Get airline reviews with pagination
-      results = await AirlineReview.find(
-        flyerClass !== "All" ? { classTravel: flyerClass } : {}
-      )
-        .populate({
-          path: "reviewer",
-          select: "name profilePhoto _id",
-          model: UserInfo,
-        })
-        .populate({
-          path: "airline",
-          select: "name countryCode _id businessClass pey economyClass",
-          model: AirlineAirport,
-        })
-        .populate({
-          path: "from",
-          select: "name _id city",
-          model: AirlineAirport,
-        })
-        .populate({
-          path: "to",
-          select: "name _id city",
-          model: AirlineAirport,
-        })
-        .sort({ date: -1 })
-        .skip(skip)
-        .limit(limit);
-    } else if (airType.toLowerCase() === "airport") {
-      // Get airport reviews with pagination
-      results = await AirportReview.find(
-        flyerClass !== "All" ? { classTravel: flyerClass } : {}
-      )
-        .populate({
-          path: "reviewer",
-          select: "name profilePhoto _id",
-          model: UserInfo,
-        })
-        .populate({
-          path: "airline",
-          select: "name _id",
-          model: AirlineAirport,
-        })
-        .populate({
-          path: "airport",
-          select: "name _id",
-          model: AirlineAirport,
-        })
-        .sort({ date: -1 })
-        .skip(skip)
-        .limit(limit);
+    let query = {};
+
+    // If searchQuery exists, create a search query and ignore other filters
+    if (searchQuery && searchQuery.trim() !== "") {
+      if (airType.toLowerCase() === "airline") {
+        results = await AirlineReview.find()
+          .populate({
+            path: "airline",
+            match: { name: { $regex: searchQuery, $options: "i" } },
+            select: "name countryCode _id businessClass pey economyClass",
+            model: AirlineAirport,
+          })
+          .populate({
+            path: "reviewer",
+            select: "name profilePhoto _id",
+            model: UserInfo,
+          })
+          .populate({
+            path: "from",
+            select: "name _id city",
+            model: AirlineAirport,
+          })
+          .populate({
+            path: "to",
+            select: "name _id city",
+            model: AirlineAirport,
+          })
+          .sort({ date: -1 })
+          .skip(skip)
+          .limit(limit);
+
+        // Filter out reviews where airline is null (due to match condition)
+        results = results.filter((review) => review.airline !== null);
+      } else if (airType.toLowerCase() === "airport") {
+        results = await AirportReview.find()
+          .populate({
+            path: "airport",
+            match: { name: { $regex: searchQuery, $options: "i" } },
+            select: "name _id",
+            model: AirlineAirport,
+          })
+          .populate({
+            path: "reviewer",
+            select: "name profilePhoto _id",
+            model: UserInfo,
+          })
+          .populate({
+            path: "airline",
+            select: "name _id",
+            model: AirlineAirport,
+          })
+          .sort({ date: -1 })
+          .skip(skip)
+          .limit(limit);
+
+        // Filter out reviews where airport is null (due to match condition)
+        results = results.filter((review) => review.airport !== null);
+      }
+    } else {
+      // Original filtering logic when no search query exists
+      if (airType.toLowerCase() === "airline") {
+        query = flyerClass !== "All" ? { classTravel: flyerClass } : {};
+        results = await AirlineReview.find(query)
+          .populate({
+            path: "reviewer",
+            select: "name profilePhoto _id",
+            model: UserInfo,
+          })
+          .populate({
+            path: "airline",
+            select: "name countryCode _id businessClass pey economyClass",
+            model: AirlineAirport,
+          })
+          .populate({
+            path: "from",
+            select: "name _id city",
+            model: AirlineAirport,
+          })
+          .populate({
+            path: "to",
+            select: "name _id city",
+            model: AirlineAirport,
+          })
+          .sort({ date: -1 })
+          .skip(skip)
+          .limit(limit);
+      } else if (airType.toLowerCase() === "airport") {
+        query = flyerClass !== "All" ? { classTravel: flyerClass } : {};
+        results = await AirportReview.find(query)
+          .populate({
+            path: "reviewer",
+            select: "name profilePhoto _id",
+            model: UserInfo,
+          })
+          .populate({
+            path: "airline",
+            select: "name _id",
+            model: AirlineAirport,
+          })
+          .populate({
+            path: "airport",
+            select: "name _id",
+            model: AirlineAirport,
+          })
+          .sort({ date: -1 })
+          .skip(skip)
+          .limit(limit);
+      }
     }
 
-    const totalCount = await (airType.toLowerCase() === "airline"
-      ? AirlineReview.countDocuments(
-          flyerClass !== "All" ? { classTravel: flyerClass } : {}
-        )
-      : AirportReview.countDocuments(
-          flyerClass !== "All" ? { classTravel: flyerClass } : {}
-        ));
+    const totalCount = results.length;
 
     res.status(200).json({
       success: true,
@@ -611,7 +669,7 @@ const getTopReviews = async (req, res) => {
 const getUserReviews = async (req, res) => {
   try {
     const { userId } = req.query;
-    
+
     const [airlineReviews, airportReviews] = await Promise.all([
       AirlineReview.find({ reviewer: userId })
         .populate({
@@ -659,7 +717,6 @@ const getUserReviews = async (req, res) => {
       (a, b) => b.date - a.date
     );
 
-    console.log(allUserReviews);
     res.status(200).json({
       success: true,
       data: allUserReviews,
