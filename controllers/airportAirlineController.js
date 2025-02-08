@@ -2,6 +2,11 @@
 /// Check if the airline/airport already exists
 const axios = require("axios");
 const AirlineAirport = require("../models/airlinePortListsSchema");
+const AirlineReview = require("../models/airlineReviewsSchema");
+const AirportReview = require("../models/airportReviewsSchema");
+const AirlineScore = require("../models/airlineScoresSchema");
+const AirportScore = require("../models/airportScoresSchema");
+const UserInfo = require("../models/userInfoSchema");
 
 ///
 /// Create the Airline and Airport api
@@ -177,8 +182,6 @@ const updateAirlineAirport = async (req, res) => {
 /// Uodate the ScoreHistory api
 const updateScoreHistory = async (req, res) => {
   try {
-    console.log("---------------------------");
-
     const { id, score } = req.body;
 
     const updatedAirlineAirport = await AirlineAirport.findByIdAndUpdate(
@@ -340,6 +343,337 @@ const createAirportByCirium = async (req, res) => {
     });
   }
 };
+
+//
+
+const getFilteredAirlineLists = async (req, res) => {
+  try {
+    const { airType, flyerClass, category, continents, page = 1 } = req.query;
+    const limit = 5;
+    const skip = (page - 1) * limit;
+
+    let query = {};
+    let sort = { overall: -1 };
+
+    // Filter by airline/airport type
+    if (airType && airType.toLowerCase() !== "all") {
+      query.isAirline = airType.toLowerCase() === "airline";
+    }
+
+    // Apply class-specific sorting
+    if (flyerClass && flyerClass !== "All") {
+      switch (flyerClass) {
+        case "Business":
+          sort = { businessClass: -1 };
+          break;
+        case "Premium Economy":
+          sort = { pey: -1 };
+          break;
+        case "Economy":
+          sort = { economyClass: -1 };
+          break;
+      }
+    }
+
+    const airlineAirports = await AirlineAirport.find(query)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit);
+    const totalCount = await AirlineAirport.countDocuments(query);
+    const hasMore = totalCount > skip + limit;
+
+    res.status(200).json({
+      success: true,
+      data: airlineAirports,
+      hasMore,
+      currentPage: parseInt(page),
+      message: "Airline and airport lists retrieved successfully",
+    });
+  } catch (error) {
+    console.error("Error fetching airline and airport lists:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching airline and airport lists",
+      error: error.message,
+    });
+  }
+};
+
+const getFilteredFeedLists = async (req, res) => {
+  try {
+    const { airType, flyerClass, page = 1 } = req.query;
+    const limit = 5;
+    const skip = (page - 1) * limit;
+
+    let results = [];
+    if (airType.toLowerCase() === "airline") {
+      // Get airline reviews with pagination
+      results = await AirlineReview.find(
+        flyerClass !== "All" ? { classTravel: flyerClass } : {}
+      )
+        .populate({
+          path: "reviewer",
+          select: "name profilePhoto _id",
+          model: UserInfo,
+        })
+        .populate({
+          path: "airline",
+          select: "name countryCode _id businessClass pey economyClass",
+          model: AirlineAirport,
+        })
+        .populate({
+          path: "from",
+          select: "name _id city",
+          model: AirlineAirport,
+        })
+        .populate({
+          path: "to",
+          select: "name _id city",
+          model: AirlineAirport,
+        })
+        .sort({ date: -1 })
+        .skip(skip)
+        .limit(limit);
+    } else if (airType.toLowerCase() === "airport") {
+      // Get airport reviews with pagination
+      results = await AirportReview.find(
+        flyerClass !== "All" ? { classTravel: flyerClass } : {}
+      )
+        .populate({
+          path: "reviewer",
+          select: "name profilePhoto _id",
+          model: UserInfo,
+        })
+        .populate({
+          path: "airline",
+          select: "name _id",
+          model: AirlineAirport,
+        })
+        .populate({
+          path: "airport",
+          select: "name _id",
+          model: AirlineAirport,
+        })
+        .sort({ date: -1 })
+        .skip(skip)
+        .limit(limit);
+    }
+
+    const totalCount = await (airType.toLowerCase() === "airline"
+      ? AirlineReview.countDocuments(
+          flyerClass !== "All" ? { classTravel: flyerClass } : {}
+        )
+      : AirportReview.countDocuments(
+          flyerClass !== "All" ? { classTravel: flyerClass } : {}
+        ));
+
+    res.status(200).json({
+      success: true,
+      data: results,
+      hasMore: totalCount > skip + limit,
+      currentPage: parseInt(page),
+      message: "Review feeds retrieved successfully",
+    });
+  } catch (error) {
+    console.error("Error fetching review feeds:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching review feeds",
+      error: error.message,
+    });
+  }
+};
+
+const getCategoryRatings = async (req, res) => {
+  try {
+    const { id, type } = req.query;
+
+    if (type === "airline") {
+      const airlineScores = await AirlineScore.findOne({ airlineId: id });
+
+      if (!airlineScores) {
+        return res.status(200).json({
+          success: true,
+          data: {
+            departureArrival: 0,
+            comfort: 0,
+            cleanliness: 0,
+            onboardService: 0,
+            foodBeverage: 0,
+            entertainmentWifi: 0,
+            count: 0,
+          },
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: airlineScores,
+      });
+    } else if (type === "airport") {
+      const airportScores = await AirportScore.findOne({ airportId: id });
+
+      if (!airportScores) {
+        return res.status(200).json({
+          success: true,
+          data: {
+            accessibility: 0,
+            waitTimes: 0,
+            helpfulness: 0,
+            ambienceComfort: 0,
+            foodBeverage: 0,
+            amenities: 0,
+            count: 0,
+          },
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: airportScores,
+      });
+    }
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Error fetching category ratings",
+      error: error.message,
+    });
+  }
+};
+
+const getTopReviews = async (req, res) => {
+  try {
+    const limit = 5;
+
+    // Get top reviews from both collections
+    const [airlineReviews, airportReviews] = await Promise.all([
+      AirlineReview.find()
+        .populate({
+          path: "reviewer",
+          select: "name profilePhoto _id",
+          model: UserInfo,
+        })
+        .populate({
+          path: "airline",
+          select: "name countryCode _id logoImage",
+          model: AirlineAirport,
+        })
+        .populate({
+          path: "from",
+          select: "name _id city",
+          model: AirlineAirport,
+        })
+        .populate({
+          path: "to",
+          select: "name _id city",
+          model: AirlineAirport,
+        })
+        .sort({ score: -1 }),
+      AirportReview.find()
+        .populate({
+          path: "reviewer",
+          select: "name profilePhoto _id",
+          model: UserInfo,
+        })
+        .populate({
+          path: "airline",
+          select: "name _id logoImage",
+          model: AirlineAirport,
+        })
+        .populate({
+          path: "airport",
+          select: "name _id logoImage",
+          model: AirlineAirport,
+        })
+        .sort({ score: -1 }),
+    ]);
+
+    // Combine and sort all reviews by score
+    const allReviews = [...airlineReviews, ...airportReviews]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit);
+
+    res.status(200).json({
+      success: true,
+      data: allReviews,
+      message: "Top reviews retrieved successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching top reviews",
+      error: error.message,
+    });
+  }
+};
+
+const getUserReviews = async (req, res) => {
+  try {
+    const { userId } = req.query;
+    
+    const [airlineReviews, airportReviews] = await Promise.all([
+      AirlineReview.find({ reviewer: userId })
+        .populate({
+          path: "reviewer",
+          select: "name profilePhoto _id",
+          model: UserInfo,
+        })
+        .populate({
+          path: "airline",
+          select: "name countryCode _id logoImage",
+          model: AirlineAirport,
+        })
+        .populate({
+          path: "from",
+          select: "name _id city",
+          model: AirlineAirport,
+        })
+        .populate({
+          path: "to",
+          select: "name _id city",
+          model: AirlineAirport,
+        })
+        .sort({ date: -1 }),
+
+      AirportReview.find({ reviewer: userId })
+        .populate({
+          path: "reviewer",
+          select: "name profilePhoto _id",
+          model: UserInfo,
+        })
+        .populate({
+          path: "airline",
+          select: "name _id logoImage",
+          model: AirlineAirport,
+        })
+        .populate({
+          path: "airport",
+          select: "name _id logoImage",
+          model: AirlineAirport,
+        })
+        .sort({ date: -1 }),
+    ]);
+
+    const allUserReviews = [...airlineReviews, ...airportReviews].sort(
+      (a, b) => b.date - a.date
+    );
+
+    console.log(allUserReviews);
+    res.status(200).json({
+      success: true,
+      data: allUserReviews,
+      message: "User reviews retrieved successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching user reviews",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createAirlineAirport,
   getAirlineAirport,
@@ -349,4 +683,9 @@ module.exports = {
   createAirlineByCirium,
   createAirportByCirium,
   updateScoreHistory,
+  getFilteredAirlineLists,
+  getFilteredFeedLists,
+  getCategoryRatings,
+  getTopReviews,
+  getUserReviews,
 };
