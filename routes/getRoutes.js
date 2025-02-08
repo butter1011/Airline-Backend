@@ -11,7 +11,11 @@ const {
 } = require("../controllers/airportAirlineController");
 const { getAirlineReviews } = require("../controllers/airlineReviewController");
 const { getAirportReviews } = require("../controllers/airportReviewController");
-const { getBoardingPass, checkPnrExists } = require("../controllers/boardingPassController");
+const {
+  getBoardingPass,
+  checkPnrExists,
+  boardingPassDetails,
+} = require("../controllers/boardingPassController");
 const { getAirlineScore } = require("../controllers/airlineScoreController");
 const { getAirportScore } = require("../controllers/airportScoreController");
 
@@ -23,7 +27,8 @@ router.get("/api/v2/boarding-pass", getBoardingPass);
 router.get("/api/v2/airline-score", getAirlineScore);
 router.get("/api/v2/airport-score", getAirportScore);
 router.get("/api/v2/airline-airport/lists", getAirlineAirportLists);
-router.get("/api/v2/check-pnr", checkPnrExists);
+router.get("/api/v2/boarding-pass/check-pnr", checkPnrExists);
+router.get("/api/v2/boarding-pass/details", boardingPassDetails);
 router.get("/api/v2/airline-list", getFilteredAirlineLists);
 router.get("/api/v2/feed-list", getFilteredFeedLists);
 router.get("/api/v2/category-ratings", getCategoryRatings);

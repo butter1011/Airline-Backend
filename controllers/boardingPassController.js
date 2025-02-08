@@ -1,4 +1,5 @@
 const BoardingPass = require("../models/boardingPassSchema");
+const AirlineAirport = require("../models/airlinePortListsSchema");
 
 const createBoardingPass = async (req, res) => {
   try {
@@ -19,7 +20,6 @@ const createBoardingPass = async (req, res) => {
       flightNumber,
       visitStatus,
       isReviewed,
-
     } = req.body;
 
     const newBoardingPass = new BoardingPass({
@@ -39,7 +39,6 @@ const createBoardingPass = async (req, res) => {
       flightNumber,
       visitStatus,
       isReviewed,
-    
     });
 
     const savedBoardingPass = await newBoardingPass.save();
@@ -73,7 +72,7 @@ const getBoardingPass = async (req, res) => {
   }
 };
 
-const updateBoardingPass = async (req, res) => { 
+const updateBoardingPass = async (req, res) => {
   try {
     const {
       _id,
@@ -93,7 +92,6 @@ const updateBoardingPass = async (req, res) => {
       flightNumber,
       visitStatus,
       isReviewed,
- 
     } = req.body;
 
     const updatedBoardingPass = await BoardingPass.findByIdAndUpdate(
@@ -114,7 +112,7 @@ const updateBoardingPass = async (req, res) => {
         airlineCode,
         flightNumber,
         visitStatus,
-        isReviewed,     
+        isReviewed,
       },
       { new: true }
     );
@@ -144,9 +142,39 @@ const checkPnrExists = async (req, res) => {
   }
 };
 
+const boardingPassDetails = async (req, res) => {
+  try {
+    const { airline, departure, arrival } = req.query;
+
+    const [airlineData, departureData, arrivalData] = await Promise.all([
+      AirlineAirport.findOne({ iataCode: airline }),
+      AirlineAirport.findOne({ iataCode: departure }),
+      AirlineAirport.findOne({ iataCode: arrival }),
+    ]);
+
+    if (!airlineData || !departureData || !arrivalData) {
+      return res.status(404).json({
+        message: "One or more requested details not found",
+      });
+    }
+
+    res.status(200).json({
+      airline: airlineData,
+      departure: departureData,
+      arrival: arrivalData,
+    });
+  } catch (error) {
+    console.error("Error retrieving boarding pass details:", error);
+    res.status(500).json({
+      message: "Failed to retrieve boarding pass details",
+      error: error.message,
+    });
+  }
+};
 module.exports = {
   createBoardingPass,
   getBoardingPass,
   updateBoardingPass,
   checkPnrExists,
+  boardingPassDetails,
 };
