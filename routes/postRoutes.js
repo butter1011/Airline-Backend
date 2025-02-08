@@ -10,6 +10,7 @@ const {
   createAirlineByCirium,
   createAirportByCirium,
   updateScoreHistory,
+  deleteAirlineAirport,
 } = require("../controllers/airportAirlineController");
 const {
   createUserInfo,
@@ -41,6 +42,7 @@ router.post("/api/v1/boarding-pass", createBoardingPass);
 router.post("/api/v1/boarding-pass/update", updateBoardingPass);
 router.post("/api/v1/airline-review/update", updateAirlineReview);
 router.post("/api/v1/airport-review/update", updateAirportReview);
+router.post("/api/v1/airline-airport/delete", deleteAirlineAirport);
 
 // Postman API
 router.post("/api/v1/airline-airport/create", createAirlineAirport);

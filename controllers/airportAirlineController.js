@@ -414,6 +414,7 @@ const getFilteredFeedLists = async (req, res) => {
 
     let results = [];
     let query = {};
+    let totalCount = 0;
 
     // If searchQuery exists, create a search query and ignore other filters
     if (searchQuery && searchQuery.trim() !== "") {
@@ -446,6 +447,13 @@ const getFilteredFeedLists = async (req, res) => {
 
         // Filter out reviews where airline is null (due to match condition)
         results = results.filter((review) => review.airline !== null);
+        totalCount = await AirlineReview.find()
+          .populate({
+            path: "airline",
+            match: { name: { $regex: searchQuery, $options: "i" } },
+            model: AirlineAirport,
+          })
+          .then(docs => docs.filter(doc => doc.airline !== null).length);
       } else if (airType.toLowerCase() === "airport") {
         results = await AirportReview.find()
           .populate({
@@ -470,6 +478,13 @@ const getFilteredFeedLists = async (req, res) => {
 
         // Filter out reviews where airport is null (due to match condition)
         results = results.filter((review) => review.airport !== null);
+        totalCount = await AirportReview.find()
+          .populate({
+            path: "airport",
+            match: { name: { $regex: searchQuery, $options: "i" } },
+            model: AirlineAirport,
+          })
+          .then(docs => docs.filter(doc => doc.airport !== null).length);
       }
     } else {
       // Original filtering logic when no search query exists
@@ -499,6 +514,8 @@ const getFilteredFeedLists = async (req, res) => {
           .sort({ date: -1 })
           .skip(skip)
           .limit(limit);
+        
+        totalCount = await AirlineReview.countDocuments(query);
       } else if (airType.toLowerCase() === "airport") {
         query = flyerClass !== "All" ? { classTravel: flyerClass } : {};
         results = await AirportReview.find(query)
@@ -520,10 +537,10 @@ const getFilteredFeedLists = async (req, res) => {
           .sort({ date: -1 })
           .skip(skip)
           .limit(limit);
+        
+        totalCount = await AirportReview.countDocuments(query);
       }
     }
-
-    const totalCount = results.length;
 
     res.status(200).json({
       success: true,
@@ -533,7 +550,7 @@ const getFilteredFeedLists = async (req, res) => {
       message: "Review feeds retrieved successfully",
     });
   } catch (error) {
-    console.error("Error fetching review feeds:", error);
+    console.error("Error fetching review feeds: ", error);
     res.status(500).json({
       success: false,
       message: "Error fetching review feeds",
@@ -541,7 +558,6 @@ const getFilteredFeedLists = async (req, res) => {
     });
   }
 };
-
 const getCategoryRatings = async (req, res) => {
   try {
     const { id, type } = req.query;
@@ -731,6 +747,38 @@ const getUserReviews = async (req, res) => {
   }
 };
 
+const deleteAirlineAirport = async (req, res) => {
+  try {
+    const { id, isAirline } = req.body;
+
+    // Delete the review based on isAirline flag
+    let deletedReview;
+    if (isAirline) {
+      deletedReview = await AirlineReview.findByIdAndDelete(id);
+    } else {
+      deletedReview = await AirportReview.findByIdAndDelete(id);
+    }
+
+    if (!deletedReview) {
+      return res.status(404).json({
+        success: false,
+        message: "Review not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Review deleted successfully",
+      data: deletedReview,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error deleting review",
+      error: error.message,
+    });
+  }
+};
 module.exports = {
   createAirlineAirport,
   getAirlineAirport,
@@ -745,4 +793,5 @@ module.exports = {
   getCategoryRatings,
   getTopReviews,
   getUserReviews,
+  deleteAirlineAirport,
 };
