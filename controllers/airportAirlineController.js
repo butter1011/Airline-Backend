@@ -348,25 +348,69 @@ const createAirportByCirium = async (req, res) => {
 
 const getFilteredAirlineLists = async (req, res) => {
   try {
-    const { airType, flyerClass, searchQuery, page = 1 } = req.query;
+    const { airType, flyerClass, category, searchQuery, page = 1 } = req.query;
     const limit = 5;
     const skip = (page - 1) * limit;
 
     let query = {};
     let sort = { overall: -1 };
+    const categoryFields = {
+      airline: {
+        "Flight Experience": "departureArrival",
+        Comfort: "comfort",
+        Cleanliness: "cleanliness",
+        Onboard: "onboardService",
+        "Airline Food": "foodBeverage",
+        "Entertainment & WiFi": "entertainmentWifi",
+      },
+      airport: {
+        Accessibility: "accessibility",
+        "Wait Times": "waitTimes",
+        Helpfulness: "helpfulness",
+        Ambience: "ambienceComfort",
+        "Airport Food": "foodBeverage",
+        Amenities: "amenities",
+      },
+    };
 
-    // If searchQuery exists, search by name based on airType
     if (searchQuery && searchQuery !== "") {
       query = {
         name: { $regex: searchQuery, $options: "i" },
       };
     } else {
-      // Original filtering logic when no search query exists
+      if (category && category !== "") {
+        const field = categoryFields[airType.toLowerCase()][category];
+        sort = { [field]: -1 };
+        const ScoreModal =
+          airType.toLowerCase() === "airline" ? AirlineScore : AirportScore;
+        const scores = await ScoreModal.find({})
+          .sort({ [field]: -1 })
+          .skip(skip)
+          .limit(limit);
+
+        const airlineAirports = await AirlineAirport.find({
+          _id: {
+            $in: scores.map((score) =>
+              score[`${airType.toLowerCase()}Id`].toString()
+            ),
+          },
+        });
+        const totalCount = await ScoreModal.countDocuments();
+        const hasMore = totalCount > skip + limit;
+
+        return res.status(200).json({
+          success: true,
+          data: airlineAirports,
+          totalCount,
+          hasMore,
+          message: "Airline and airport lists retrieved successfully",
+        });
+      }
+
       if (airType && airType.toLowerCase() !== "all") {
         query.isAirline = airType.toLowerCase() === "airline";
       }
 
-      // Apply class-specific sorting
       if (flyerClass && flyerClass !== "All") {
         switch (flyerClass) {
           case "Business":
@@ -408,7 +452,13 @@ const getFilteredAirlineLists = async (req, res) => {
 
 const getFilteredFeedLists = async (req, res) => {
   try {
-    const { airType, flyerClass, page = 1, searchQuery = "" } = req.query;
+    const {
+      airType,
+      flyerClass,
+      category,
+      page = 1,
+      searchQuery = "",
+    } = req.query;
     const limit = 5;
     const skip = (page - 1) * limit;
 
@@ -453,7 +503,7 @@ const getFilteredFeedLists = async (req, res) => {
             match: { name: { $regex: searchQuery, $options: "i" } },
             model: AirlineAirport,
           })
-          .then(docs => docs.filter(doc => doc.airline !== null).length);
+          .then((docs) => docs.filter((doc) => doc.airline !== null).length);
       } else if (airType.toLowerCase() === "airport") {
         results = await AirportReview.find()
           .populate({
@@ -484,7 +534,7 @@ const getFilteredFeedLists = async (req, res) => {
             match: { name: { $regex: searchQuery, $options: "i" } },
             model: AirlineAirport,
           })
-          .then(docs => docs.filter(doc => doc.airport !== null).length);
+          .then((docs) => docs.filter((doc) => doc.airport !== null).length);
       }
     } else {
       // Original filtering logic when no search query exists
@@ -514,7 +564,7 @@ const getFilteredFeedLists = async (req, res) => {
           .sort({ date: -1 })
           .skip(skip)
           .limit(limit);
-        
+
         totalCount = await AirlineReview.countDocuments(query);
       } else if (airType.toLowerCase() === "airport") {
         query = flyerClass !== "All" ? { classTravel: flyerClass } : {};
@@ -537,7 +587,7 @@ const getFilteredFeedLists = async (req, res) => {
           .sort({ date: -1 })
           .skip(skip)
           .limit(limit);
-        
+
         totalCount = await AirportReview.countDocuments(query);
       }
     }
