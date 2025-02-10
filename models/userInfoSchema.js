@@ -15,7 +15,6 @@ const userInfoSchema = new mongoose.Schema(
     apple: {
       type: String,
       required: false,
-      unique: true,
     },
     flyertype: {
       type: String,
