@@ -716,7 +716,7 @@ const getTopReviews = async (req, res) => {
     // Combine and sort all reviews by score
     const allReviews = [...airlineReviews, ...airportReviews]
       .sort((a, b) => b.score - a.score)
-      .slice(0, limit);
+      .slice(0, Math.min(limit, [...airlineReviews, ...airportReviews].length));
 
     res.status(200).json({
       success: true,
