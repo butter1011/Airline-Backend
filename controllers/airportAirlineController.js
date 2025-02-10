@@ -509,7 +509,7 @@ const getFilteredFeedLists = async (req, res) => {
           .populate({
             path: "airport",
             match: { name: { $regex: searchQuery, $options: "i" } },
-            select: "name _id",
+            select: "name _id city",
             model: AirlineAirport,
           })
           .populate({
@@ -581,7 +581,7 @@ const getFilteredFeedLists = async (req, res) => {
           })
           .populate({
             path: "airport",
-            select: "name _id",
+            select: "name _id city",
             model: AirlineAirport,
           })
           .sort({ date: -1 })
@@ -707,7 +707,7 @@ const getTopReviews = async (req, res) => {
         })
         .populate({
           path: "airport",
-          select: "name _id logoImage",
+          select: "name _id logoImage city",
           model: AirlineAirport,
         })
         .sort({ score: -1 }),
@@ -773,7 +773,7 @@ const getUserReviews = async (req, res) => {
         })
         .populate({
           path: "airport",
-          select: "name _id logoImage",
+          select: "name _id logoImage city",
           model: AirlineAirport,
         })
         .sort({ date: -1 }),
