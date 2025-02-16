@@ -829,6 +829,69 @@ const deleteAirlineAirport = async (req, res) => {
     });
   }
 };
+
+const getEntityReviews = async (req, res) => {
+  try {
+    const { id, type } = req.query;
+    let reviews = [];
+    console.log(id, type);
+
+    if (type === 'airline') {
+      reviews = await AirlineReview.find({ airline: id })
+        .populate({
+          path: "reviewer",
+          select: "name profilePhoto _id",
+          model: UserInfo,
+        })
+        .populate({ 
+          path: "airline",
+          select: "name countryCode _id logoImage",
+          model: AirlineAirport,
+        })
+        .populate({
+          path: "from",
+          select: "name _id city",
+          model: AirlineAirport,
+        })
+        .populate({
+          path: "to",
+          select: "name _id city",
+          model: AirlineAirport,
+        })
+        .sort({ date: -1 });
+    } else if (type === 'airport') {
+      reviews = await AirportReview.find({ airport: id })
+        .populate({
+          path: "reviewer",
+          select: "name profilePhoto _id",
+          model: UserInfo,
+        })
+        .populate({
+          path: "airline",
+          select: "name _id logoImage",
+          model: AirlineAirport,
+        })
+        .populate({
+          path: "airport",
+          select: "name _id logoImage city",
+          model: AirlineAirport,
+        })
+        .sort({ date: -1 });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: reviews,
+      message: `${type} reviews retrieved successfully`,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching reviews",
+      error: error.message,
+    });
+  }
+};
 module.exports = {
   createAirlineAirport,
   getAirlineAirport,
@@ -844,4 +907,5 @@ module.exports = {
   getTopReviews,
   getUserReviews,
   deleteAirlineAirport,
+  getEntityReviews,
 };

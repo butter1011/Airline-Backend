@@ -8,6 +8,7 @@ const {
   getCategoryRatings,
   getTopReviews,
   getUserReviews,
+  getEntityReviews,
 } = require("../controllers/airportAirlineController");
 const { getAirlineReviews } = require("../controllers/airlineReviewController");
 const { getAirportReviews } = require("../controllers/airportReviewController");
@@ -34,5 +35,6 @@ router.get("/api/v2/feed-list", getFilteredFeedLists);
 router.get("/api/v2/category-ratings", getCategoryRatings);
 router.get("/api/v2/top-reviews", getTopReviews);
 router.get("/api/v2/user-reviews", getUserReviews);
+router.get("/api/v2/entity-reviews", getEntityReviews);
 
 module.exports = router;
